@@ -4,6 +4,8 @@ import express from 'express'
 import { config } from '../../../config';
 
 const dbUrl: any = config.DB_URL;
+
+console.log("dbUrl => ",dbUrl);
 const mongooseConnection = express()
 // mongoose.set('strictQuery', true);
 mongoose.connect(
