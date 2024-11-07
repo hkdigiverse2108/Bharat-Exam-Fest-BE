@@ -1,0 +1,58 @@
+name: Deploy Games-BE
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+    paths:
+      - 'Games-BE/**'
+
+jobs:
+  # deploy-to-dev:
+  #   runs-on: ubuntu-latest
+  #   name: Deploy Games-BE to Dev
+  #   if: ${{ github.ref == 'refs/heads/dev' }}
+    
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v3
+
+  #   - name: Set up SSH for BE
+  #     run: |
+  #       mkdir -p ~/.ssh
+  #       echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+  #       chmod 600 ~/.ssh/id_rsa
+  #       ssh-keyscan -H 65.1.192.13 >> ~/.ssh/known_hosts
+
+  #   - name: Test SSH Connection for BE
+  #     run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@65.1.192.13 "echo 'SSH connection successful!'"
+
+  #   - name: Deploy Games-BE changes to Dev via SSH
+  #     run: |
+  #       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@65.1.192.13 \
+  #       "cd /home/root/bharat-exam-fest/live && git pull origin dev && npm i && pm2 restart bharat-exam-fest-live"
+
+  deploy-to-main:
+    runs-on: ubuntu-latest
+    name: Deploy Games-BE to Main
+    if: ${{ github.ref == 'refs/heads/main' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH for BE
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 65.1.192.13 >> ~/.ssh/known_hosts
+
+    - name: Test SSH Connection for BE
+      run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@65.1.192.13 "echo 'SSH connection successful!'"
+
+    - name: Deploy Games-BE changes to Main via SSH
+      run: |
+        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@65.1.192.13 \
+        "cd /home/root/bharat-exam-fest/live && git pull origin main && npm i && pm2 restart bharat-exam-fest-live"

@@ -1,0 +1,1828 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Admin API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000"
+    },
+    {
+      "url": "http://62.72.58.17"
+    },
+    {
+      "url": "https://api-bef.hkdigiverse.com"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "authorization"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Subject"
+    },
+    {
+      "name": "Classes"
+    },
+    {
+      "name": "Question"
+    }
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "adminSignUp",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "contact": {
+                    "type": "object",
+                    "properties": {
+                      "countryCode": {
+                        "type": "string"
+                      },
+                      "mobile": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ]
+        },
+        "responses": {
+          "200": {
+            "description": "Admin Created Successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "firstName": {
+                      "type": "string"
+                    },
+                    "lastName": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "adminLogin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "userId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/auth/otp/verify": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "admin Otp Verify ",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "otp": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Otp Verify successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/sub-topic/add": {
+      "post": {
+        "tags": ["Sub-Topic"],
+        "description": "Add a new sub-topic",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sub-topic added successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/sub-topic/edit": {
+      "post": {
+        "tags": ["Sub-Topic"],
+        "description": "Edit an existing sub-topic",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subTopicId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["subTopicId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sub-topic edited successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/sub-topic/delete/{id}": {
+      "delete": {
+        "tags": ["Sub-Topic"],
+        "description": "Delete a sub-topic by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sub-topic deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/sub-topic/all": {
+      "get": {
+        "tags": ["Sub-Topic"],
+        "description": "Get all sub-topics",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term to filter sub-topics"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of sub-topics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sub-topic/{id}": {
+      "get": {
+        "tags": ["Sub-Topic"],
+        "description": "Get a sub-topic by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sub-topic details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/subject/add": {
+      "post": {
+        "tags": [
+          "Subject"
+        ],
+        "description": "Add a new subject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "subTopicIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subject added successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/subject/edit": {
+      "post": {
+        "tags": [
+          "Subject"
+        ],
+        "description": "Edit an existing subject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subjectId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "subTopicIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "subjectId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subject edited successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/subject/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Subject"
+        ],
+        "description": "Delete a subject by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subject deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/subject/all": {
+      "get": {
+        "tags": [
+          "Subject"
+        ],
+        "description": "Get all subjects",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term to filter subjects by name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of subjects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subject/{id}": {
+      "get": {
+        "tags": [
+          "Subject"
+        ],
+        "description": "Get a subject by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subject details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/user/add": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "description": "Add a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "gender": {
+                    "type": "string"
+                  },
+                  "dob": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "referralCode": {
+                    "type": "string"
+                  },
+                  "contact": {
+                    "type": "object",
+                    "properties": {
+                      "countryCode": {
+                        "type": "string"
+                      },
+                      "mobile": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "upscNumber": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User added successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/user/edit": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "description": "Edit an existing user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "gender": {
+                    "type": "string"
+                  },
+                  "dob": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "referralCode": {
+                    "type": "string"
+                  },
+                  "contact": {
+                    "type": "object",
+                    "properties": {
+                      "countryCode": {
+                        "type": "string"
+                      },
+                      "mobile": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "upscNumber": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User edited successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/user/delete/{id}": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "description": "Delete a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/user/all": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Get all users",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term to filter users"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "firstName": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Get a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/classes/add": {
+      "post": {
+        "tags": [
+          "Classes"
+        ],
+        "description": "Add a new class",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "contact": {
+                    "type": "object",
+                    "properties": {
+                      "countryCode": {
+                        "type": "string"
+                      },
+                      "mobile": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "referralCode": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "account": {
+                    "type": "object",
+                    "properties": {
+                      "accountNumber": {
+                        "type": "string"
+                      },
+                      "ifscCode": {
+                        "type": "string"
+                      },
+                      "bankName": {
+                        "type": "string"
+                      },
+                      "upiId": {
+                        "type": "string"
+                      },
+                      "swifCode": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Class added successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/classes/edit": {
+      "post": {
+        "tags": [
+          "Classes"
+        ],
+        "description": "Edit an existing class",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "classesId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "contact": {
+                    "type": "object",
+                    "properties": {
+                      "countryCode": {
+                        "type": "string"
+                      },
+                      "mobile": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "referralCode": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "account": {
+                    "type": "object",
+                    "properties": {
+                      "accountNumber": {
+                        "type": "string"
+                      },
+                      "ifscCode": {
+                        "type": "string"
+                      },
+                      "bankName": {
+                        "type": "string"
+                      },
+                      "upiId": {
+                        "type": "string"
+                      },
+                      "swifCode": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Class edited successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/classes/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Classes"
+        ],
+        "description": "Delete a class by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Class deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/classes/all": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "description": "Get all classes",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term to filter classes"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of classes"
+          }
+        }
+      }
+    },
+    "/classes/{id}": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "description": "Get a class by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Class details"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/question/add": {
+      "post": {
+        "tags": [
+          "Question"
+        ],
+        "description": "Add a new question",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subjectId": {
+                    "type": "string"
+                  },
+                  "subtopic": {
+                    "type": "string"
+                  },
+                  "questionBank": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "englishQuestion": {
+                    "type": "object",
+                    "properties": {
+                      "question": {
+                        "type": "string"
+                      },
+                      "options": {
+                        "type": "object",
+                        "properties": {
+                          "A": {
+                            "type": "boolean",
+                            "default": false
+                          },
+                          "B": {
+                            "type": "boolean",
+                            "default": false
+                          },
+                          "C": {
+                            "type": "boolean",
+                            "default": false
+                          },
+                          "D": {
+                            "type": "boolean",
+                            "default": false
+                          }
+                        }
+                      },
+                      "answer": {
+                        "type": "string"
+                      },
+                      "solution": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "hindiQuestion": {
+                    "type": "object",
+                    "properties": {
+                      "question": {
+                        "type": "string"
+                      },
+                      "options": {
+                        "type": "object",
+                        "properties": {
+                          "A": {
+                            "type": "boolean",
+                            "default": false
+                          },
+                          "B": {
+                            "type": "boolean",
+                            "default": false
+                          },
+                          "C": {
+                            "type": "boolean",
+                            "default": false
+                          },
+                          "D": {
+                            "type": "boolean",
+                            "default": false
+                          }
+                        }
+                      },
+                      "answer": {
+                        "type": "string"
+                      },
+                      "solution": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "subjectId",
+                  "subtopic",
+                  "questionBank",
+                  "type",
+                  "englishQuestion",
+                  "hindiQuestion"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Question added successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/question/edit": {
+      "post": {
+        "tags": [
+          "Question"
+        ],
+        "description": "Edit an existing question",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "questionId": {
+                    "type": "string"
+                  },
+                  "subjectId": {
+                    "type": "string"
+                  },
+                  "subtopic": {
+                    "type": "string"
+                  },
+                  "questionBank": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "englishQuestion": {
+                    "type": "object",
+                    "properties": {
+                      "question": {
+                        "type": "string"
+                      },
+                      "options": {
+                        "type": "object",
+                        "properties": {
+                          "A": {
+                            "type": "boolean"
+                          },
+                          "B": {
+                            "type": "boolean"
+                          },
+                          "C": {
+                            "type": "boolean"
+                          },
+                          "D": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "answer": {
+                        "type": "string"
+                      },
+                      "solution": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "hindiQuestion": {
+                    "type": "object",
+                    "properties": {
+                      "question": {
+                        "type": "string"
+                      },
+                      "options": {
+                        "type": "object",
+                        "properties": {
+                          "A": {
+                            "type": "boolean"
+                          },
+                          "B": {
+                            "type": "boolean"
+                          },
+                          "C": {
+                            "type": "boolean"
+                          },
+                          "D": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "answer": {
+                        "type": "string"
+                      },
+                      "solution": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "questionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Question edited successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/question/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Question"
+        ],
+        "description": "Delete a question by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/question/all": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "description": "Get all questions",
+        "responses": {
+          "200": {
+            "description": "A list of questions"
+          }
+        }
+      }
+    },
+    "/question/{id}": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "description": "Get a question by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question details"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/contest/add": {
+      "post": {
+        "tags": [
+          "Contest"
+        ],
+        "description": "Add a new contest",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contestName": {
+                    "type": "string"
+                  },
+                  "contestType": {
+                    "type": "string"
+                  },
+                  "contestStartDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "contestEndDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "totalSpots": {
+                    "type": "integer"
+                  },
+                  "fees": {
+                    "type": "number"
+                  },
+                  "winningAmountPerFee": {
+                    "type": "number"
+                  },
+                  "winnerPercentage": {
+                    "type": "number"
+                  },
+                  "ranks": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "place": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "totalQuestions": {
+                    "type": "integer"
+                  },
+                  "totalTime": {
+                    "type": "string"
+                  },
+                  "totalMarks": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "contestName",
+                  "contestType",
+                  "contestStartDate",
+                  "contestEndDate",
+                  "totalSpots",
+                  "fees",
+                  "winningAmountPerFee",
+                  "winnerPercentage",
+                  "totalQuestions",
+                  "totalTime",
+                  "totalMarks"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contest added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/contest/edit": {
+      "post": {
+        "tags": [
+          "Contest"
+        ],
+        "description": "Edit an existing contest",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contestId": {
+                    "type": "string"
+                  },
+                  "contestName": {
+                    "type": "string"
+                  },
+                  "contestType": {
+                    "type": "string"
+                  },
+                  "contestStartDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "contestEndDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "totalSpots": {
+                    "type": "integer"
+                  },
+                  "fees": {
+                    "type": "number"
+                  },
+                  "winningAmountPerFee": {
+                    "type": "number"
+                  },
+                  "winnerPercentage": {
+                    "type": "number"
+                  },
+                  "ranks": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "place": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "totalQuestions": {
+                    "type": "integer"
+                  },
+                  "totalTime": {
+                    "type": "string"
+                  },
+                  "totalMarks": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "contestId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contest edited successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/contest/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Contest"
+        ],
+        "description": "Delete a contest by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contest deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/contest/all": {
+      "get": {
+        "tags": [
+          "Contest"
+        ],
+        "description": "Get all contests",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term to filter contests"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of contests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contest_data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "totalData": {
+                      "type": "integer"
+                    },
+                    "state": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "integer"
+                        },
+                        "limit": {
+                          "type": "integer"
+                        },
+                        "page_limit": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/contest/{id}": {
+      "get": {
+        "tags": [
+          "Contest"
+        ],
+        "description": "Get a contest by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contest details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "contestName": {
+                      "type": "string"
+                    },
+                    "contestType": {
+                      "type": "string"
+                    },
+                    "contestStartDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "contestEndDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "totalSpots": {
+                      "type": "integer"
+                    },
+                    "fees": {
+                      "type": "number"
+                    },
+                    "winningAmountPerFee": {
+                      "type": "number"
+                    },
+                    "winnerPercentage": {
+                      "type": "number"
+                    },
+                    "ranks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "place": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "totalQuestions": {
+                      "type": "integer"
+                    },
+                    "totalTime": {
+                      "type": "string"
+                    },
+                    "totalMarks": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  }
+}
