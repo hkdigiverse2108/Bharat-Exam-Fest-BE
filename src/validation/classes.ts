@@ -11,6 +11,7 @@ export const addClassesSchema = Joi.object().keys({
     country: Joi.string().optional(),
     referralCode: Joi.string().optional(),
     image: Joi.string().optional(),
+    password: Joi.string().optional(),
     account: Joi.object().keys({
         accountNumber: Joi.string().optional(),
         ifscCode: Joi.string().optional(),
@@ -32,6 +33,7 @@ export const editClassesSchema = Joi.object().keys({
     image: Joi.string().optional(),
     email: Joi.string().email().optional(),
     country: Joi.string().optional(),
+    password: Joi.string().optional(),
     account: Joi.object().keys({
         accountNumber: Joi.string().optional(),
         ifscCode: Joi.string().optional(),

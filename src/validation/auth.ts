@@ -13,13 +13,14 @@ export const signUpSchema = Joi.object().keys({
 });
 
 export const loginSchema = Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(6).max(15).required(),
+    uniqueId: Joi.string().email().required(),
+    password: Joi.string().required(),
+    userType: Joi.string().required(),
 });
 
 export const resetPasswordSchema = Joi.object().keys({
     email: Joi.string().email().required(),
-    password: Joi.string().min(6).max(15).required(),
+    password: Joi.string().required(),
 });
 
 export const otpVerifySchema = Joi.object().keys({

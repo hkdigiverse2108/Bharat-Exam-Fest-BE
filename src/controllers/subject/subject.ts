@@ -1,4 +1,4 @@
-import { subjectModel } from "../../database";
+import { subjectModel, subTopicModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { apiResponse } from "../../utils";
 import { addSubjectSchema, deleteSubjectSchema, editSubjectSchema, getSubjectSchema } from "../../validation";
@@ -16,6 +16,8 @@ export const add_subject = async (req, res) => {
 
         value.createdBy = new ObjectId(user._id)
         value.updatedBy = new ObjectId(user._id)
+
+
 
         let isExist = await subjectModel.findOne({ name: value.name, isDeleted: false })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("Subject Name"), {}, {}))
@@ -39,13 +41,25 @@ export const edit_subject_by_id = async (req, res) => {
         }
         value.updatedBy = new ObjectId(user._id)
 
-        let isExist = await subjectModel.findOne({ name: value.name, isDeleted: false, _id: { $ne: value.subjectId } })
+        let subject = await subjectModel.findOne({ _id: new ObjectId(value.subjectId) })
+        if (!subject) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("subject"), {}, {}))
+
+        const existingSubTopicIds = subject.subTopicIds.map(id => id.toString());
+        const newSubTopicIds = value.subTopicIds.map(id => id.toString());
+        const matchingIds = newSubTopicIds.filter(id => existingSubTopicIds.includes(id));
+
+        if (matchingIds.length > 0) {
+            return res.status(400).json(new apiResponse(400, responseMessage?.dataAlreadyExist("sub topic"), {}, {}))
+        }
+
+        let isExist = await subjectModel.findOne({ name: value.name, isDeleted: false, _id: { $ne: new ObjectId(value.subjectId) } })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("Subject Name"), {}, {}))
 
         const response = await subjectModel.findOneAndUpdate({ _id: new ObjectId(value.subjectId) }, value, { new: true })
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.updateDataError("subject"), {}, {}))
         return res.status(200).json(new apiResponse(200, responseMessage?.updateDataSuccess("subject"), response, {}))
     } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
@@ -87,9 +101,9 @@ export const get_all_subject = async (req, res) => {
             {
                 $lookup: {
                     from: 'sub-topics',
-                    let: { subTopicIds: "$subTopicIds" },
+                    let: { subTopicIds: { $ifNull: ["$subTopicIds", []] } }, // Ensure subTopicIds is an array
                     pipeline: [
-                        { $match: { $expr: { $in: ["$_id", "$$subTopicIds"] } } },
+                        { $match: { $expr: { $and: [{ $in: ["$_id", "$$subTopicIds"] }] } } },
                         { $project: { name: 1, isDeleted: 1 } }
                     ],
                     as: 'subTopics'
@@ -105,7 +119,7 @@ export const get_all_subject = async (req, res) => {
                     data_count: [{ $count: "count" }]
                 }
             }
-        ])
+        ]);
 
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("subject"), {}, {}))
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("subject"), {
@@ -118,6 +132,7 @@ export const get_all_subject = async (req, res) => {
             },
         }, {}))
     } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }

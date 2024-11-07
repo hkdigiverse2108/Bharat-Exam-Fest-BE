@@ -111,8 +111,8 @@ export const login = async (req, res) => {
             return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}));
         }
 
-        response = await userModel.findOne({ email: value?.email, userType: ROLE_TYPES.USER }).lean()
-        if(!response) response = await classesModel.findOne({ email: value?.email, userType: ROLE_TYPES.CLASSES }).lean()
+        response = await userModel.findOne({ email: value?.uniqueId, userType: value?.userType }).lean()
+        if(!response) response = await classesModel.findOne({ email: value?.uniqueId, userType: value?.userType }).lean()
 
         if (!response) return res.status(400).json(new apiResponse(400, responseMessage?.userNotFound, {}, {}))
 
