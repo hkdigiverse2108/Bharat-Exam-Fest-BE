@@ -9,11 +9,11 @@ export const signUpSchema = Joi.object().keys({
         countryCode: Joi.string().optional(),
         mobile: Joi.string().optional()
     }).optional(),
-    password: Joi.string().min(6).max(15).optional(),
+    password: Joi.string().optional(),
 });
 
 export const loginSchema = Joi.object().keys({
-    uniqueId: Joi.string().email().required(),
+    uniqueId: Joi.string().required(),
     password: Joi.string().required(),
     userType: Joi.string().required(),
 });
