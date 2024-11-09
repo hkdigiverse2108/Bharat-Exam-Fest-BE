@@ -21,6 +21,9 @@ export const add_user = async (req, res) => {
         let isExist = await userModel.findOne({ email: value.email })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("email"), {}, {}))
 
+        isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile })
+        if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("mobile"), {}, {}))
+
         let otp = await getUniqueOtp()
         
         if(value?.contact?.mobile){
@@ -57,9 +60,18 @@ export const edit_user_by_id = async (req, res) => {
         if (error) {
             return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}));
         }
+        
+        let isExist = await userModel.findOne({ _id: new ObjectId(value.userId), isDeleted: false })
+        if (!isExist) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("user"), {}, {}))
+
+        isExist = await userModel.findOne({ email: value.email })
+        if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("email"), {}, {}))
+
+        isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile })
+        if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("mobile"), {}, {}))
 
         value.updatedBy = new ObjectId(user?._id)
-        const response = await userModel.findOneAndUpdate({ _id: new ObjectId(value._id), isDeleted: false }, value, { new: true });
+        const response = await userModel.findOneAndUpdate({ _id: new ObjectId(value.userId), isDeleted: false }, value, { new: true });
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.updateDataError("user"), {}, {}));
         return res.status(200).json(new apiResponse(200, responseMessage?.updateDataSuccess("user"), response, {}));
     } catch (error) {
