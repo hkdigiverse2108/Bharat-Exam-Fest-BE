@@ -1476,17 +1476,17 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "contestName": {
+                  "name": {
                     "type": "string"
                   },
-                  "contestType": {
+                  "type": {
                     "type": "string"
                   },
-                  "contestStartDate": {
+                  "startDate": {
                     "type": "string",
                     "format": "date-time"
                   },
-                  "contestEndDate": {
+                  "endDate": {
                     "type": "string",
                     "format": "date-time"
                   },
@@ -1521,21 +1521,11 @@
                   },
                   "totalMarks": {
                     "type": "integer"
+                  },
+                  "classesId": {
+                    "type": "string"
                   }
-                },
-                "required": [
-                  "contestName",
-                  "contestType",
-                  "contestStartDate",
-                  "contestEndDate",
-                  "totalSpots",
-                  "fees",
-                  "winningAmountPerFee",
-                  "winnerPercentage",
-                  "totalQuestions",
-                  "totalTime",
-                  "totalMarks"
-                ]
+                }
               }
             }
           }
@@ -1581,20 +1571,17 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "contestId": {
+                  "name": {
                     "type": "string"
                   },
-                  "contestName": {
+                  "type": {
                     "type": "string"
                   },
-                  "contestType": {
-                    "type": "string"
-                  },
-                  "contestStartDate": {
+                  "startDate": {
                     "type": "string",
                     "format": "date-time"
                   },
-                  "contestEndDate": {
+                  "endDate": {
                     "type": "string",
                     "format": "date-time"
                   },
@@ -1629,11 +1616,11 @@
                   },
                   "totalMarks": {
                     "type": "integer"
+                  },
+                  "classesId": {
+                    "type": "string"
                   }
-                },
-                "required": [
-                  "contestId"
-                ]
+                }
               }
             }
           }
