@@ -71,6 +71,6 @@ export const sendSms = async (to: string, otp) => {
         return {sid : message.sid};
     } catch (error) {
         console.error(`Error sending message: ${error}`);
-        throw error;
+        return { sid: null };
     }
 }

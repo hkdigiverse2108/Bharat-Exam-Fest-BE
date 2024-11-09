@@ -18,10 +18,10 @@ export const add_user = async (req, res) => {
         value.createdBy = new ObjectId(user?._id)
         value.updatedBy = new ObjectId(user?._id)
 
-        let isExist = await userModel.findOne({ email: value.email })
+        let isExist = await userModel.findOne({ email: value.email, userType: ROLE_TYPES.USER, isDeleted: false })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("email"), {}, {}))
 
-        isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile })
+        isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile, userType: ROLE_TYPES.USER, isDeleted: false })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("mobile"), {}, {}))
 
         let otp = await getUniqueOtp()
@@ -64,11 +64,11 @@ export const edit_user_by_id = async (req, res) => {
         let isExist = await userModel.findOne({ _id: new ObjectId(value.userId), isDeleted: false })
         if (!isExist) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("user"), {}, {}))
 
-        isExist = await userModel.findOne({ email: value.email, _id: { $ne: new ObjectId(value.userId) } })
+        isExist = await userModel.findOne({ email: value.email, userType: ROLE_TYPES.USER, isDeleted: false, _id: { $ne: new ObjectId(value.userId) } })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("email"), {}, {}))
 
-        isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile, _id: { $ne: new ObjectId(value.userId) } })
-        if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("mobile"), {}, {}))
+        // isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile, userType: ROLE_TYPES.USER, isDeleted: false, _id: { $ne: new ObjectId(value.userId) } })
+        // if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("mobile"), {}, {}))
 
         value.updatedBy = new ObjectId(user?._id)
         const response = await userModel.findOneAndUpdate({ _id: new ObjectId(value.userId), isDeleted: false }, value, { new: true });
