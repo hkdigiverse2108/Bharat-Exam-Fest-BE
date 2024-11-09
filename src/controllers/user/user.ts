@@ -64,10 +64,10 @@ export const edit_user_by_id = async (req, res) => {
         let isExist = await userModel.findOne({ _id: new ObjectId(value.userId), isDeleted: false })
         if (!isExist) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("user"), {}, {}))
 
-        isExist = await userModel.findOne({ email: value.email })
+        isExist = await userModel.findOne({ email: value.email, _id: { $ne: new ObjectId(value.userId) } })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("email"), {}, {}))
 
-        isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile })
+        isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile, _id: { $ne: new ObjectId(value.userId) } })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("mobile"), {}, {}))
 
         value.updatedBy = new ObjectId(user?._id)
