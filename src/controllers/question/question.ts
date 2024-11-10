@@ -1,4 +1,4 @@
-import { apiResponse } from "../../utils";
+import { apiResponse, ROLE_TYPES } from "../../utils";
 import { questionModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { addQuestionSchema, deleteQuestionSchema, editQuestionSchema, getQuestionSchema } from "../../validation";
@@ -63,7 +63,7 @@ export const delete_question_by_id = async (req, res) => {
 
 export const get_all_questions = async (req, res) => {
     reqInfo(req);
-    let { page, limit, search } = req.query;
+    let { page, limit, search, subjectFilter, classesFilter, subtopicFilter, questionTypeFilter, typeFilter } = req.query, { user } = req.headers;
     let response: any, match: any = {};
 
     try {
@@ -72,17 +72,81 @@ export const get_all_questions = async (req, res) => {
         
         match.isDeleted = false;
 
+        if(user.userType === ROLE_TYPES.CLASSES){
+            match.classesId = new ObjectId(user._id)
+        }
+
+        if(subjectFilter){
+            match.subjectId = new ObjectId(subjectFilter)
+        }
+
+        if(classesFilter){
+            match.classesId = new ObjectId(classesFilter)
+        }
+
+        if(subtopicFilter){
+            match.subtopicId = new ObjectId(subtopicFilter)
+        }
+
+        if(questionTypeFilter){
+            match.questionType = questionTypeFilter
+        }
+
+        if(typeFilter){
+            match.type = typeFilter
+        }
+
         if (search) {
             match.$or = [
-                { firstName: { $regex: search, $options: 'i' } },
-                { lastName: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { "contact.mobile": { $regex: search, $options: 'i' } }
+                { "englishQuestion.question": { $regex: search, $options: 'i' } },
+                { "hindiQuestion.question": { $regex: search, $options: 'i' } },
             ]
         }
 
         response = await questionModel.aggregate([
             { $match: match },
+            {
+                $lookup: {
+                    from: 'subjects',
+                    let: { subjectId: "$subjectId" }, // Ensure subTopicIds is an array
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$subjectId"] }] } } },
+                        { $project: { name: 1, isDeleted: 1 } }
+                    ],
+                    as: 'subject'
+                }
+            },
+            {
+                $unwind: { path: "$subject", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'classes',
+                    let: { classesId: "$classesId" }, // Ensure subTopicIds is an array
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$classesId"] }] } } },
+                        { $project: { name: 1, isDeleted: 1 } }
+                    ],
+                    as: 'classes'
+                }
+            },
+            {
+                $unwind: { path: "$classes", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'sub-topics',
+                    let: { subtopicId: "$subtopicId" }, // Ensure subTopicIds is an array
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$subtopicId"] }] } } },
+                        { $project: { name: 1, isDeleted: 1 } }
+                    ],
+                    as: 'subtopic'
+                }
+            },
+            {
+                $unwind: { path: "$subtopic", preserveNullAndEmptyArrays: true }
+            },
             {
                 $facet: {
                     data: [
@@ -126,3 +190,49 @@ export const get_question_by_id = async (req, res) => {
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 };
+
+
+export const subject_wise_question_count = async(req, res) => {
+    reqInfo(req)
+    let { user } = req.headers, match: any = {}
+    try {
+
+        if(user.userType === ROLE_TYPES.CLASSES){
+            match.classesId = new ObjectId(user._id)
+        }
+
+        match.isDeleted = false
+        
+        let response = await questionModel.aggregate([
+            { $match: match },
+            { $group: { _id: "$subjectId", count: { $sum: 1 } } },
+            {
+                $lookup: {
+                    from: 'subjects',
+                    let: { subjectId: "$_id" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$_id", "$$subjectId"] } } },
+                        { $project: { name: 1, isDeleted: 1 } }
+                    ],
+                    as: 'subject'
+                }
+            },
+            {
+                $unwind: { path: "$subject", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    count: 1,
+                    subjectName: "$subject.name",
+                    subjectImage: "$subject.image"
+                }
+            }
+        ])
+
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("question count"), response, {}))
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}

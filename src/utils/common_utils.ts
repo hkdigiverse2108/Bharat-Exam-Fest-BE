@@ -48,10 +48,16 @@ export const generateUserId = (prefix) => {
     return userId;
 }
 
-export const questionType = {
+export const typeQuestion = {
     EASY: 'easy',
     MEDIUM: 'medium',
     TOUGH: 'tough'
+}
+
+export const questionType = {
+    NORMAL: 'normal',
+    STATEMENT: 'statement',
+    PAIR: 'pair'
 }
 
 export const questionAnswer = {

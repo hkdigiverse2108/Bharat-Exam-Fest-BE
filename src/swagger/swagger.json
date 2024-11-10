@@ -1188,7 +1188,10 @@
                   "subjectId": {
                     "type": "string"
                   },
-                  "subtopic": {
+                  "classesId": {
+                    "type": "string"
+                  },
+                  "subtopicId": {
                     "type": "string"
                   },
                   "questionBank": {
@@ -1207,20 +1210,16 @@
                         "type": "object",
                         "properties": {
                           "A": {
-                            "type": "boolean",
-                            "default": false
+                            "type": "string"
                           },
                           "B": {
-                            "type": "boolean",
-                            "default": false
+                            "type": "string"
                           },
                           "C": {
-                            "type": "boolean",
-                            "default": false
+                            "type": "string"
                           },
                           "D": {
-                            "type": "boolean",
-                            "default": false
+                            "type": "string"
                           }
                         }
                       },
@@ -1242,20 +1241,16 @@
                         "type": "object",
                         "properties": {
                           "A": {
-                            "type": "boolean",
-                            "default": false
+                            "type": "string"
                           },
                           "B": {
-                            "type": "boolean",
-                            "default": false
+                            "type": "string"
                           },
                           "C": {
-                            "type": "boolean",
-                            "default": false
+                            "type": "string"
                           },
                           "D": {
-                            "type": "boolean",
-                            "default": false
+                            "type": "string"
                           }
                         }
                       },
@@ -1309,7 +1304,13 @@
                   "subjectId": {
                     "type": "string"
                   },
+                  "classesId": {
+                    "type": "string"
+                  },
                   "subtopic": {
+                    "type": "string"
+                  },
+                  "subtopicId": {
                     "type": "string"
                   },
                   "questionBank": {
@@ -1328,16 +1329,16 @@
                         "type": "object",
                         "properties": {
                           "A": {
-                            "type": "boolean"
+                            "type": "string"
                           },
                           "B": {
-                            "type": "boolean"
+                            "type": "string"
                           },
                           "C": {
-                            "type": "boolean"
+                            "type": "string"
                           },
                           "D": {
-                            "type": "boolean"
+                            "type": "string"
                           }
                         }
                       },
@@ -1359,16 +1360,16 @@
                         "type": "object",
                         "properties": {
                           "A": {
-                            "type": "boolean"
+                            "type": "string"
                           },
                           "B": {
-                            "type": "boolean"
+                            "type": "string"
                           },
                           "C": {
-                            "type": "boolean"
+                            "type": "string"
                           },
                           "D": {
-                            "type": "boolean"
+                            "type": "string"
                           }
                         }
                       },
@@ -1430,6 +1431,82 @@
           "Question"
         ],
         "description": "Get all questions",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term to filter classes"
+          },
+          {
+            "name": "subjectFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Subject ID to filter questions"
+          },
+          {
+            "name": "classesFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Classes ID to filter questions"
+          },
+          {
+            "name": "subtopicFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Subtopic ID to filter questions"
+          },
+          {
+            "name": "questionTypeFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Question type to filter questions"
+          },
+          {
+            "name": "typeFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Type to filter questions"
+          }
+        ],
         "responses": {
           "200": {
             "description": "A list of questions"
@@ -1459,6 +1536,19 @@
           },
           "400": {
             "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/question/subject-wise-question-count": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "description": "Get subject wise question count",
+        "responses": {
+          "200": {
+            "description": "Subject wise question count"
           }
         }
       }

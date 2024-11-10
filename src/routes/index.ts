@@ -7,6 +7,7 @@ import { classesRouter } from "./classes";
 import { userRouter } from "./user";
 import { contestRouter } from "./contest";
 import { subTopicRouter } from "./sub-topic";
+import { questionRouter } from "./question";
 
 const router = Router()
 
@@ -18,5 +19,6 @@ router.use('/subject', subjectRouter)
 router.use('/classes', classesRouter)
 router.use('/contest', contestRouter)
 router.use('/sub-topic', subTopicRouter)
+router.use('/question', questionRouter)
 
 export default router

@@ -1,30 +1,32 @@
-import { questionAnswer, questionType } from "../../utils";
+import { questionAnswer, questionType, typeQuestion } from "../../utils";
 
 const mongoose = require('mongoose')
 
 const questionSchema: any = new mongoose.Schema({
-    subject: { type: String, required: true },
-    subtopic: { type: String, required: true },
-    questionBank: { type: String, required: true },
-    type: { type: String, enum: Object.values(questionType), required: true },
+    subjectId: { type: mongoose.Schema.Types.ObjectId, ref: "subject" },
+    classesId: { type: mongoose.Schema.Types.ObjectId, ref: "classes" },
+    subtopicId: { type: mongoose.Schema.Types.ObjectId, ref: "sub-topic" },
+    questionBank: { type: String },
+    type: { type: String, enum: Object.values(typeQuestion) },
+    questionType: { type: String, enum: Object.values(questionType) },
     englishQuestion: {
-        question: { type: String, required: true },
+        question: { type: String },
         options: {
-            A: { type: Boolean, default: false },
-            B: { type: Boolean, default: false },
-            C: { type: Boolean, default: false },
-            D: { type: Boolean, default: false }
+            A: { type: String, default: false },
+            B: { type: String, default: false },
+            C: { type: String, default: false },
+            D: { type: String, default: false }
         },
-        answer: { type: String, enum: Object.values(questionAnswer), required: true },
-        solution: { type: String, required: true }
+        answer: { type: String, enum: Object.values(questionAnswer) },
+        solution: { type: String }
     },
     hindiQuestion: {
         question: { type: String, required: true },
         options: {
-            A: { type: Boolean, default: false },
-            B: { type: Boolean, default: false },
-            C: { type: Boolean, default: false },
-            D: { type: Boolean, default: false }
+            A: { type: String, default: false },
+            B: { type: String, default: false },
+            C: { type: String, default: false },
+            D: { type: String, default: false }
         },
         answer: { type: String, enum: Object.values(questionAnswer), required: true },
         solution: { type: String, required: true }

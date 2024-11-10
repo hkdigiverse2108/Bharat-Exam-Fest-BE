@@ -3,46 +3,48 @@ import { questionAnswer, questionType } from "../utils";
 
 export const addQuestionSchema = Joi.object().keys({
     subjectId: Joi.string().required(),
-    subtopic: Joi.string().required(),
-    questionBank: Joi.string().required(),
+    classesId: Joi.string().required(),
+    subtopicId: Joi.string().required(),
+    questionBank: Joi.string().optional(),
     type: Joi.string().valid(...Object.values(questionType)).required(),
     englishQuestion: Joi.object().keys({
         question: Joi.string().required(),
         options: Joi.object().keys({
-            A: Joi.boolean().required(),
-            B: Joi.boolean().required(),
-            C: Joi.boolean().required(),
-            D: Joi.boolean().required()
+            A: Joi.string().optional(),
+            B: Joi.string().optional(),    
+            C: Joi.string().optional(),
+            D: Joi.string().optional()
         }).required(),
         answer: Joi.string().valid(...Object.values(questionAnswer)).required(),
-        solution: Joi.string().required()
+        solution: Joi.string().optional()
     }).required(),
     hindiQuestion: Joi.object().keys({
         question: Joi.string().required(),
         options: Joi.object().keys({
-            A: Joi.boolean().required(),
-            B: Joi.boolean().required(),
-            C: Joi.boolean().required(),
-            D: Joi.boolean().required()
+            A: Joi.string().optional(),
+            B: Joi.string().optional(),
+            C: Joi.string().optional(),
+            D: Joi.string().optional()
         }).required(),
         answer: Joi.string().valid(...Object.values(questionAnswer)).required(),
-        solution: Joi.string().required()
+        solution: Joi.string().optional()
     }).required()
 });
 
 export const editQuestionSchema = Joi.object().keys({
     questionId: Joi.string().required(),
-    subjectId: Joi.string(),
-    subtopic: Joi.string(),
-    questionBank: Joi.string(),
+    subjectId: Joi.string().optional(),
+    classesId: Joi.string().optional(),
+    subtopicId: Joi.string().optional(),
+    questionBank: Joi.string().optional(),
     type: Joi.string().valid(...Object.values(questionType)).optional(),
     englishQuestion: Joi.object().keys({
-        question: Joi.string().required(),
+        question: Joi.string().optional(),
         options: Joi.object().keys({
-            A: Joi.boolean().optional(),
-            B: Joi.boolean().optional(),
-            C: Joi.boolean().optional(),
-            D: Joi.boolean().optional()
+            A: Joi.string().optional(),
+            B: Joi.string().optional(),
+            C: Joi.string().optional(),
+            D: Joi.string().optional()
         }).required(),
         answer: Joi.string().valid(...Object.values(questionAnswer)).optional(),
         solution: Joi.string().optional()
@@ -50,10 +52,10 @@ export const editQuestionSchema = Joi.object().keys({
     hindiQuestion: Joi.object().keys({
         question: Joi.string().optional(),
         options: Joi.object().keys({
-            A: Joi.boolean().optional(),
-            B: Joi.boolean().optional(),
-            C: Joi.boolean().optional(),
-            D: Joi.boolean().optional()
+            A: Joi.string().optional(),
+            B: Joi.string().optional(),
+            C: Joi.string().optional(),
+            D: Joi.string().optional()
         }).required(),
         answer: Joi.string().valid(...Object.values(questionAnswer)).optional(),
         solution: Joi.string().optional()
