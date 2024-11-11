@@ -1937,6 +1937,103 @@
           }
         }
       }
+    },
+    "/balance/add": {
+      "post": {
+        "tags": ["Balance"],
+        "summary": "Add a new balance entry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Balance added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/balance/all": {
+      "get": {
+        "tags": ["Balance"],
+        "summary": "Get all balance entries",
+        "parameters": [
+          {
+            "name": "typeFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of balance entries"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/balance/{id}": {
+      "get": {
+        "tags": ["Balance"],
+        "summary": "Get balance by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Balance details"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   }
 }

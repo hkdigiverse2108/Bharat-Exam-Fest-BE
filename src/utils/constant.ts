@@ -23,3 +23,13 @@ export const GENDER_TYPES = {
     FEMALE: "female"
 }
 
+export const BALANCE_STATUS = {
+    SUCCESS: "success",
+    FAILED: "failed"
+}
+
+export const BALANCE_TYPE = {
+    DEPOSIT: "deposit",
+    WITHDRAW: "withdraw"
+}
+

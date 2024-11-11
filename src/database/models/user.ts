@@ -15,6 +15,7 @@ const userSchema: any = new mongoose.Schema({
         countryCode: { type: String },
         mobile: { type: String }
     },
+    walletBalance: { type: Number, default: 0 },
     uniqueId: { type: String },
     upscNumber: { type: String },
     password: { type: String, default: null },
