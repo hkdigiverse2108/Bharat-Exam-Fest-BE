@@ -6,6 +6,7 @@ const balanceSchema: any = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     name: { type: String },
     amount: { type: Number },
+    utrId: { type: String },
     status: { type: String, enum: Object.values(BALANCE_STATUS) },
     type: { type: String, enum: Object.values(BALANCE_TYPE) },
     isDeleted: { type: Boolean, default: false },
