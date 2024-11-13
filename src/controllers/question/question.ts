@@ -221,6 +221,32 @@ export const subject_wise_question_count = async(req, res) => {
                 $unwind: { path: "$subject", preserveNullAndEmptyArrays: true }
             },
             {
+                $lookup: {
+                    from: 'classes',
+                    let: { classesId: "$_id" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$_id", "$$classesId"] } } },
+                        { $project: { name: 1, isDeleted: 1 } }
+                    ],
+                    as: 'classes'
+                }
+            },
+            {
+                $unwind: { path: "$classes", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'sub-topics',
+                    let: { subTopicIds: { $ifNull: ["$subTopicIds", []] } }, // Ensure subTopicIds is an array
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $in: ["$_id", "$$subTopicIds"] }] } } },
+                        { $project: { name: 1, isDeleted: 1 } }
+                    ],
+                    as: 'subTopics'
+                }
+            },
+            
+            {
                 $project: {
                     _id: 1,
                     count: 1,
