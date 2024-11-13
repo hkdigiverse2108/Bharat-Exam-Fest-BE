@@ -2381,39 +2381,7 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of 'How to Play' entries",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "how_to_play_data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    },
-                    "totalData": {
-                      "type": "integer"
-                    },
-                    "state": {
-                      "type": "object",
-                      "properties": {
-                        "page": {
-                          "type": "integer"
-                        },
-                        "limit": {
-                          "type": "integer"
-                        },
-                        "page_limit": {
-                          "type": "integer"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "A list of 'How to Play' entries"
           },
           "404": {
             "description": "'How to Play' entries not found"
@@ -2440,28 +2408,7 @@
         ],
         "responses": {
           "200": {
-            "description": "'How to Play' entry details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "title": {
-                      "type": "string"
-                    },
-                    "link": {
-                      "type": "string"
-                    },
-                    "image": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "'How to Play' entry details"
           },
           "404": {
             "description": "'How to Play' entry not found"
