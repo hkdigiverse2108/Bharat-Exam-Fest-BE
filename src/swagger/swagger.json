@@ -2242,7 +2242,7 @@
     },
     "/how-to-play/add": {
       "post": {
-        "tags": ["HowToPlay"],
+        "tags": ["How To Play"],
         "description": "Add a new 'How to Play' entry",
         "requestBody": {
           "required": true,
@@ -2280,7 +2280,7 @@
     },
     "/how-to-play/edit/{id}": {
       "post": {
-        "tags": ["HowToPlay"],
+        "tags": ["How To Play"],
         "description": "Edit an existing 'How to Play' entry by ID",
         "parameters": [
           {
@@ -2328,7 +2328,7 @@
     },
     "/how-to-play/delete/{id}": {
       "delete": {
-        "tags": ["HowToPlay"],
+        "tags": ["How To Play"],
         "description": "Delete a 'How to Play' entry by ID",
         "parameters": [
           {
@@ -2355,7 +2355,7 @@
     },
     "/how-to-play/all": {
       "get": {
-        "tags": ["HowToPlay"],
+        "tags": ["How To Play"],
         "description": "Get all 'How to Play' entries",
         "parameters": [
           {
@@ -2394,7 +2394,7 @@
     },
     "/how-to-play/{id}": {
       "get": {
-        "tags": ["HowToPlay"],
+        "tags": ["How To Play"],
         "description": "Get a 'How to Play' entry by ID",
         "parameters": [
           {
@@ -2412,6 +2412,102 @@
           },
           "404": {
             "description": "'How to Play' entry not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/privacy-policy/add/edit": {
+      "post": {
+        "tags": ["Privacy Policy"],
+        "summary": "Add or edit the privacy policy",
+        "description": "This endpoint allows adding or editing the privacy policy.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "privacyPolicy": {
+                    "type": "string",
+                    "description": "The privacy policy content"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Privacy policy updated successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/privacy-policy": {
+      "get": {
+        "tags": ["Privacy Policy"],
+        "description": "Get the privacy policy",
+        "responses": {
+          "200": {
+            "description": "The privacy policy"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/terms-condition/add/edit": {
+      "post": {
+        "tags": ["Terms Condition"],
+        "summary": "Add or edit the terms condition",
+        "description": "This endpoint allows adding or editing the terms condition.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "termsCondition": {
+                    "type": "string",
+                    "description": "The terms condition content"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Privacy policy updated successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/terms-condition": {
+      "get": {
+        "tags": ["Terms Condition"],
+        "description": "Get the terms condition",
+        "responses": {
+          "200": {
+            "description": "The terms condition"
           },
           "500": {
             "description": "Internal server error"
