@@ -15,7 +15,7 @@ export const addUserSchema = Joi.object().keys({
         mobile: Joi.string().optional()
     }).optional(),
     upscNumber: Joi.string().optional(),
-    password: Joi.string().min(6).max(15).optional()
+    password: Joi.string().optional()
 });
 
 export const editUserSchema = Joi.object().keys({
@@ -33,7 +33,7 @@ export const editUserSchema = Joi.object().keys({
         mobile: Joi.string().optional()
     }).optional(),
     upscNumber: Joi.string().optional(),
-    password: Joi.string().min(6).max(15).optional(),
+    password: Joi.string().optional(),
 });
 
 export const deleteUserSchema = Joi.object().keys({

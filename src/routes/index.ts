@@ -9,6 +9,8 @@ import { contestRouter } from "./contest";
 import { subTopicRouter } from "./sub-topic";
 import { questionRouter } from "./question";
 import { balanceRouter } from "./balance";
+import { bannerRouter } from "./banner";
+import { howToPlayRouter } from "./how-to-play";
 
 const router = Router()
 
@@ -22,5 +24,7 @@ router.use('/contest', contestRouter)
 router.use('/sub-topic', subTopicRouter)
 router.use('/question', questionRouter)
 router.use('/balance', balanceRouter)
+router.use('/banner', bannerRouter)
+router.use('/how-to-play', howToPlayRouter)
 
 export default router

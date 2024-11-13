@@ -70,7 +70,7 @@ export const questionAnswer = {
 export const sendSms = async (to: string, otp) => {
     try {
         const message = await client.messages.create({
-            body: `Hello! Your One-Time Password (OTP) is: ${otp}. Please use this code to complete your verification. This code is valid for a short time. Thank you!`,
+            body: `Hello! Your One-Time Password (OTP) is: ${otp}. Please use this code to complete your verification!`,
             from: config.TWIlIO_PHONE_NUMBER,
             to: to
         });

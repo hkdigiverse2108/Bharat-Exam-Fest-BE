@@ -153,17 +153,23 @@ export const forgot_password = async (req, res) => {
             return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}));
         }
 
-        let data = await userModel.findOne({ $or: [{email: value?.uniqueId}, {"contact.mobile": value?.uniqueId}], userType: value?.userType });
-        data = await classesModel.findOne({ $or: [{email: value?.uniqueId}, {"contact.mobile": value?.uniqueId}], userType: value?.userType });
+        let data = await userModel.findOne({ $or: [{email: value?.uniqueId}, {"contact.mobile": value?.uniqueId}], userType: value?.userType, isDeleted: false })
+        if(!data) data = await classesModel.findOne({ $or: [{email: value?.uniqueId}, {"contact.mobile": value?.uniqueId}], userType: value?.userType, isDeleted: false });
 
         if (!data) {
-            return res.status(400).json(new apiResponse(400, responseMessage?.invalidEmail, {}, {}));
+            return res.status(400).json(new apiResponse(400, responseMessage?.invalidEmailOrPhoneNumber, {}, {}));
         }
         if (data.isBlocked == true) {
             return res.status(403).json(new apiResponse(403, responseMessage?.accountBlock, {}, {}));
         }
 
         const otp = await getUniqueOtp()
+        
+        if(data?.contact?.mobile){
+            let mobileNumber = data?.contact?.countryCode + data?.contact?.mobile
+            let sms = await sendSms(mobileNumber, otp)
+            if(!sms.sid) return res.status(404).json(new apiResponse(404, "Invalid Phone Number", {}, {}))
+        }
         // await userModel.findOneAndUpdate(value, { otp, otpExpireTime: new Date(new Date().setMinutes(new Date().getMinutes() + 10)) })
         let response = await userModel.findOneAndUpdate({_id: new ObjectId(data?._id)}, { otp }, { new: true })
         if(!response) response = await classesModel.findOneAndUpdate({_id: new ObjectId(data?._id)}, { otp }, { new: true })
@@ -191,8 +197,8 @@ export const reset_password = async (req, res) => {
 
         const payload = { password: hashPassword }
 
-        let response = await userModel.findOneAndUpdate({ $or: [{email: value?.uniqueId}, {"contact.mobile": value?.uniqueId}], userType: value?.userType }, payload, { new: true })
-        response = await classesModel.findOneAndUpdate({ $or: [{email: value?.uniqueId}, {"contact.mobile": value?.uniqueId}], userType: value?.userType }, payload, { new: true })
+        let response = await userModel.findOneAndUpdate({ $or: [{email: value?.uniqueId}, {"contact.mobile": value?.uniqueId}], userType: value?.userType, isDeleted: false }, payload, { new: true })
+        if(!response) response = await classesModel.findOneAndUpdate({ $or: [{email: value?.uniqueId}, {"contact.mobile": value?.uniqueId}], userType: value?.userType, isDeleted: false }, payload, { new: true })
 
         if (!response) return res.status(405).json(new apiResponse(405, responseMessage?.resetPasswordError, {}, {}))
         return res.status(200).json(new apiResponse(200, responseMessage?.resetPasswordSuccess, response, {}))

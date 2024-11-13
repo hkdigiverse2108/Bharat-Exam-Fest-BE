@@ -11,7 +11,7 @@ export const responseMessage = {
     otpSendSuccess: "OTP has been sent successfully!",
     expireOTP: "OTP has been expired!",
     OTPverified: "OTP has been verified successfully!",
-    invalidEmail: "You have entered an invalid email!",
+    invalidEmailOrPhoneNumber: "You have entered an invalid email or phone number!",
     emailVerificationComplete: "Email verification complete!",
     invalidAccessToken : "Invalid access token",
     invalidIdTokenAndAccessToken: "You have entered an invalid idToken or accessToken!",
