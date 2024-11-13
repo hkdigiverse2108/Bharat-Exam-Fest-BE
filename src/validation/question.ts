@@ -1,12 +1,13 @@
 import Joi from "joi";
-import { questionAnswer, questionType } from "../utils";
+import { questionAnswer, questionType, typeQuestion } from "../utils";
 
 export const addQuestionSchema = Joi.object().keys({
     subjectId: Joi.string().required(),
     classesId: Joi.string().required(),
-    subtopicId: Joi.string().required(),
+    subtopicIds: Joi.array().items(Joi.string()).required(),
     questionBank: Joi.string().optional(),
-    type: Joi.string().valid(...Object.values(questionType)).required(),
+    type: Joi.string().valid(...Object.values(typeQuestion)).required(),
+    questionType: Joi.string().valid(...Object.values(questionType)).required(),
     englishQuestion: Joi.object().keys({
         question: Joi.string().required(),
         options: Joi.object().keys({
@@ -37,7 +38,8 @@ export const editQuestionSchema = Joi.object().keys({
     classesId: Joi.string().optional(),
     subtopicId: Joi.string().optional(),
     questionBank: Joi.string().optional(),
-    type: Joi.string().valid(...Object.values(questionType)).optional(),
+    type: Joi.string().valid(...Object.values(typeQuestion)).optional(),
+    questionType: Joi.string().valid(...Object.values(questionType)).optional(),
     englishQuestion: Joi.object().keys({
         question: Joi.string().optional(),
         options: Joi.object().keys({

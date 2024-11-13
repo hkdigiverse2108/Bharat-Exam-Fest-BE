@@ -165,7 +165,7 @@ export const get_user_by_id = async (req, res) => {
 export const get_all_user = async(req, res) => {
     reqInfo(req)
     try {
-        let response = await userModel.find({isDeleted: false}).select("firstName lastName _id")
+        let response = await userModel.find({userType: ROLE_TYPES.USER, isDeleted: false}).select("firstName lastName _id")
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("user"),response, {}));
     } catch (error) {
         console.log(error);

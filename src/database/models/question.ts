@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const questionSchema: any = new mongoose.Schema({
     subjectId: { type: mongoose.Schema.Types.ObjectId, ref: "subject" },
     classesId: { type: mongoose.Schema.Types.ObjectId, ref: "classes" },
-    subtopicId: { type: mongoose.Schema.Types.ObjectId, ref: "sub-topic" },
+    subtopicIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "sub-topic" }],
     questionBank: { type: String },
     type: { type: String, enum: Object.values(typeQuestion) },
     questionType: { type: String, enum: Object.values(questionType) },

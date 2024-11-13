@@ -19,14 +19,17 @@ export const loginSchema = Joi.object().keys({
 });
 
 export const resetPasswordSchema = Joi.object().keys({
-    email: Joi.string().email().required(),
+    uniqueId: Joi.string().required(),
     password: Joi.string().required(),
+    userType: Joi.string().required(),
 });
 
 export const otpVerifySchema = Joi.object().keys({
     otp: Joi.string().pattern(/^\d{6}$/).required(),
+    userType: Joi.string().required(),
 });
 
 export const forgotPasswordSchema = Joi.object().keys({
-    email: Joi.string().email().required(),
+    uniqueId: Joi.string().required(),
+    userType: Joi.string().required(),
 });

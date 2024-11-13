@@ -189,10 +189,8 @@
     },
     "/auth/otp/verify": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "admin Otp Verify ",
+        "tags": ["Auth"],
+        "description": "Verify OTP for authentication",
         "requestBody": {
           "required": true,
           "content": {
@@ -202,18 +200,85 @@
                 "properties": {
                   "otp": {
                     "type": "string"
+                  },
+                  "userType": {
+                    "type": "string"
                   }
                 }
               }
             }
           }
         },
-        "produces": [
-          "application/json"
-        ],
         "responses": {
           "200": {
-            "description": "Otp Verify successfully"
+            "description": "OTP verified successfully"
+          },
+          "400": {
+            "description": "Invalid OTP"
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": ["Auth"],
+        "description": "Request password reset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset link sent"
+          },
+          "400": {
+            "description": "Invalid email"
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "tags": ["Auth"],
+        "description": "Reset password using OTP",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uniqueId": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "userType": {
+                    "type": "string"
+                  }
+                },
+                "required": ["uniqueId", "password", "userType"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully"
           },
           "400": {
             "description": "Invalid input"
@@ -1191,13 +1256,19 @@
                   "classesId": {
                     "type": "string"
                   },
-                  "subtopicId": {
-                    "type": "string"
+                  "subtopicIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   "questionBank": {
                     "type": "string"
                   },
                   "type": {
+                    "type": "string"
+                  },
+                  "questionType": {
                     "type": "string"
                   },
                   "englishQuestion": {
@@ -1262,15 +1333,7 @@
                       }
                     }
                   }
-                },
-                "required": [
-                  "subjectId",
-                  "subtopic",
-                  "questionBank",
-                  "type",
-                  "englishQuestion",
-                  "hindiQuestion"
-                ]
+                }
               }
             }
           }
@@ -1307,16 +1370,19 @@
                   "classesId": {
                     "type": "string"
                   },
-                  "subtopic": {
-                    "type": "string"
-                  },
-                  "subtopicId": {
-                    "type": "string"
+                  "subtopicIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   "questionBank": {
                     "type": "string"
                   },
                   "type": {
+                    "type": "string"
+                  },
+                  "questionType": {
                     "type": "string"
                   },
                   "englishQuestion": {
@@ -1381,10 +1447,7 @@
                       }
                     }
                   }
-                },
-                "required": [
-                  "questionId"
-                ]
+                }
               }
             }
           }
