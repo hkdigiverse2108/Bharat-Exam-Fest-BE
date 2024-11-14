@@ -36,7 +36,7 @@ export const editQuestionSchema = Joi.object().keys({
     questionId: Joi.string().required(),
     subjectId: Joi.string().optional(),
     classesId: Joi.string().optional(),
-    subtopicId: Joi.string().optional(),
+    subtopicIds: Joi.array().items(Joi.string()).optional(),
     questionBank: Joi.string().optional(),
     type: Joi.string().valid(...Object.values(typeQuestion)).optional(),
     questionType: Joi.string().valid(...Object.values(questionType)).optional(),
