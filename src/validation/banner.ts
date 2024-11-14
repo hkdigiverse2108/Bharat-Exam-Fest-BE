@@ -1,13 +1,15 @@
 import Joi from "joi";
-import { GENDER_TYPES, ROLE_TYPES } from "../utils";
+import { BANNER_TYPE } from "../utils";
 
 export const addBannerSchema = Joi.object().keys({
-    image: Joi.string().required()
+    image: Joi.string().required(),
+    type: Joi.string().valid(...Object.values(BANNER_TYPE)).required()
 });
 
 export const editBannerSchema = Joi.object().keys({
     bannerId: Joi.string().required(),
-    image: Joi.string().optional()
+    image: Joi.string().optional(),
+    type: Joi.string().valid(...Object.values(BANNER_TYPE)).optional()
 });
 
 export const deleteBannerSchema = Joi.object().keys({

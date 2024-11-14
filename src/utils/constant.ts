@@ -33,3 +33,7 @@ export const BALANCE_TYPE = {
     WITHDRAW: "withdraw"
 }
 
+export const BANNER_TYPE = {
+    HOME: "home",
+    RESULTS: "results"
+}

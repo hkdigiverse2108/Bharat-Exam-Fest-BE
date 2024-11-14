@@ -2115,6 +2115,9 @@
                 "properties": {
                   "image": {
                     "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
                   }
                 }
               }
@@ -2149,6 +2152,9 @@
                     "type": "string"
                   },
                   "image": {
+                    "type": "string"
+                  },
+                  "type": {
                     "type": "string"
                   }
                 }
