@@ -36,7 +36,7 @@ export const edit_question_by_id = async (req, res) => {
             return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}));
         }
         value.updatedBy = new ObjectId(user?._id)
-        const response = await questionModel.findOneAndUpdate({ _id: new ObjectId(value._id), isDeleted: false }, value, { new: true });
+        const response = await questionModel.findOneAndUpdate({ _id: new ObjectId(value.questionId), isDeleted: false }, value, { new: true });
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.updateDataError("question"), {}, {}));
         return res.status(200).json(new apiResponse(200, responseMessage?.updateDataSuccess("question"), response, {}));
     } catch (error) {
