@@ -287,6 +287,41 @@
         }
       }
     },
+    "/auth/change-password": {
+      "post": {
+        "tags": ["Auth"],
+        "description": "change password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "oldPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password change successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
     "/sub-topic/add": {
       "post": {
         "tags": ["Sub-Topic"],

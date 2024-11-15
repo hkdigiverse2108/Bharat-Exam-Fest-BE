@@ -12,6 +12,7 @@ import { balanceRouter } from "./balance";
 import { bannerRouter } from "./banner";
 import { howToPlayRouter } from "./how-to-play";
 import { privacyPolicyRouter } from "./privacy-policy";
+import { termsConditionRouter } from "./terms-condition";
 
 const router = Router()
 
@@ -28,5 +29,6 @@ router.use('/balance', balanceRouter)
 router.use('/banner', bannerRouter)
 router.use('/how-to-play', howToPlayRouter)
 router.use('/privacy-policy', privacyPolicyRouter)
+router.use('/terms-condition', termsConditionRouter)
 
 export default router
