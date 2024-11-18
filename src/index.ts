@@ -14,8 +14,6 @@ import router from './routes';
 import swaggerUi from 'swagger-ui-express';
 import * as swaggerDocument from './swagger/swagger.json';
 import { config } from '../config';
-import { extractCardDetails } from './controllers/aadhar-card/aadhar-card';
-
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -63,5 +61,3 @@ app.use(router)
 app.use('*', bad_gateway);
 
 export let server = new http.Server(app);
-
-extractCardDetails("./IMG_20220820_200845.jpg", "PAN");
