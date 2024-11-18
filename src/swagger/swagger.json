@@ -1968,65 +1968,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Contest details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "contestName": {
-                      "type": "string"
-                    },
-                    "contestType": {
-                      "type": "string"
-                    },
-                    "contestStartDate": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "contestEndDate": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "totalSpots": {
-                      "type": "integer"
-                    },
-                    "fees": {
-                      "type": "number"
-                    },
-                    "winningAmountPerFee": {
-                      "type": "number"
-                    },
-                    "winnerPercentage": {
-                      "type": "number"
-                    },
-                    "ranks": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "place": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
-                    "totalQuestions": {
-                      "type": "integer"
-                    },
-                    "totalTime": {
-                      "type": "string"
-                    },
-                    "totalMarks": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Contest details"
           },
           "400": {
             "description": "Invalid input"
@@ -2153,6 +2095,9 @@
                   },
                   "type": {
                     "type": "string"
+                  },
+                  "link": {
+                    "type": "string"
                   }
                 }
               }
@@ -2172,7 +2117,7 @@
         }
       }
     },
-    "/banner/edit/{id}": {
+    "/banner/edit": {
       "post": {
         "tags": ["Banner"],
         "description": "Edit a banner by ID",
@@ -2190,6 +2135,9 @@
                     "type": "string"
                   },
                   "type": {
+                    "type": "string"
+                  },
+                  "link": {
                     "type": "string"
                   }
                 }
@@ -2319,20 +2267,10 @@
         }
       }
     },
-    "/how-to-play/edit/{id}": {
+    "/how-to-play/edit": {
       "post": {
         "tags": ["How To Play"],
         "description": "Edit an existing 'How to Play' entry by ID",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2521,8 +2459,7 @@
                 "type": "object",
                 "properties": {
                   "termsCondition": {
-                    "type": "string",
-                    "description": "The terms condition content"
+                    "type": "string"
                   }
                 }
               }
@@ -2549,6 +2486,100 @@
         "responses": {
           "200": {
             "description": "The terms condition"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/illegality/add/edit": {
+      "post": {
+        "tags": ["Illegality"],
+        "summary": "Add or edit the illegality",
+        "description": "This endpoint allows adding or editing the illegality.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "illegality": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Illegality updated successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/illegality": {
+      "get": {
+        "tags": ["Illegality"],
+        "description": "Get the illegality",
+        "responses": {
+          "200": {
+            "description": "The illegality"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/about-us/add/edit": {
+      "post": {
+        "tags": ["About Us"],
+        "summary": "Add or edit the about us",
+        "description": "This endpoint allows adding or editing the about us.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "aboutUs": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "About us updated successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/about-us": {
+      "get": {
+        "tags": ["About Us"],
+        "description": "Get the about us",
+        "responses": {
+          "200": {
+            "description": "The about us"
           },
           "500": {
             "description": "Internal server error"
