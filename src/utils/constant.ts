@@ -37,3 +37,16 @@ export const BANNER_TYPE = {
     HOME: "home",
     RESULTS: "results"
 }
+
+export const KYC_STATUS = {
+    PENDING: "pending",
+    APPROVED: "approved",
+    REJECTED: "rejected"
+}
+
+export const ID_PROOF = {
+    AADHAR_CARD: "aadharCard",
+    PAN_CARD: "panCard",
+    VOTER_ID: "voterId",
+    PASSPORT: "passport"
+}

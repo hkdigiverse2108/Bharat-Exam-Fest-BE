@@ -15,6 +15,7 @@ import { privacyPolicyRouter } from "./privacy-policy";
 import { termsConditionRouter } from "./terms-condition";
 import { illegalityRouter } from "./illegality";
 import { aboutUsRouter } from "./about-us";
+import { kycRouter } from "./kyc";
 
 const router = Router()
 
@@ -34,5 +35,6 @@ router.use('/privacy-policy', privacyPolicyRouter)
 router.use('/terms-condition', termsConditionRouter)
 router.use('/illegality', illegalityRouter)
 router.use('/about-us', aboutUsRouter)
+router.use('/kyc', kycRouter)
 
 export default router

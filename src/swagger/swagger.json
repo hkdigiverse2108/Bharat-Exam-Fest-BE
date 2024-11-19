@@ -2586,6 +2586,212 @@
           }
         }
       }
+    },
+    "/kyc/add": {
+      "post": {
+        "tags": ["KYC"],
+        "description": "Add a new 'How to Play' entry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idNumber": {
+                    "type": "string"
+                  },
+                  "idProof": {
+                    "type": "string"
+                  },
+                  "frontSideImage": {
+                    "type": "string"
+                  },
+                  "backSideImage": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "'How to Play' entry added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/kyc/edit": {
+      "post": {
+        "tags": ["KYC"],
+        "description": "Edit an existing 'KYC' entry by ID",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kycId": {
+                    "type": "string"
+                  },
+                  "idNumber": {
+                    "type": "string"
+                  },
+                  "idProof": {
+                    "type": "string"
+                  },
+                  "frontSideImage": {
+                    "type": "string"
+                  },
+                  "backSideImage": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "'KYC' entry edited successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/kyc/delete/{id}": {
+      "delete": {
+        "tags": ["KYC"],
+        "description": "Delete a 'KYC' entry by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "'KYC' entry deleted successfully"
+          },
+          "404": {
+            "description": "'KYC' entry not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/kyc/all": {
+      "get": {
+        "tags": ["KYC"],
+        "description": "Get all 'KYC' entries",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "statusFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of 'KYC' entries"
+          },
+          "404": {
+            "description": "'KYC' entries not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/kyc/{id}": {
+      "get": {
+        "tags": ["KYC"],
+        "description": "Get a 'KYC' entry by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "'KYC' entry details"
+          },
+          "404": {
+            "description": "'KYC' entry not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   }
 }

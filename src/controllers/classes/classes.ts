@@ -33,7 +33,7 @@ export const add_classes = async (req, res) => {
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}))
         return res.status(200).json(new apiResponse(200, responseMessage?.addDataSuccess("classes"), response, {}))
     } catch (error) {
-        console.log(error);
+        console.log("error", error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
@@ -58,6 +58,7 @@ export const edit_classes_by_id = async (req, res) => {
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.updateDataError("classes"), {}, {}))
         return res.status(200).json(new apiResponse(200, responseMessage?.updateDataSuccess("classes"), response, {}))
     } catch (error) {
+        console.log("error", error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
@@ -121,6 +122,7 @@ export const get_all_classes = async (req, res) => {
             },
         }, {}))
     } catch (error) {
+        console.log("error", error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
@@ -137,6 +139,7 @@ export const get_classes_by_id = async (req, res) => {
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("classes"), {}, {}))
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("classes"), response, {}))
     } catch (error) {
+        console.log("error", error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
