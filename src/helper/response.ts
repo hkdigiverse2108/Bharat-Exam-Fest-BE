@@ -8,6 +8,8 @@ export const responseMessage = {
     accountBlock: "Your account has been blocked!",
     invalidUserPasswordEmail: "You have entered an invalid username or password!",
     invalidOTP: "Invalid OTP!",
+    emailNotVerified: "Your email is not verified! Please verify your email.",
+    mobileNotVerified: "Your mobile number is not verified! Please verify your mobile number.",
     otpSendSuccess: "OTP has been sent successfully!",
     expireOTP: "OTP has been expired!",
     OTPverified: "OTP has been verified successfully!",

@@ -1,12 +1,13 @@
 "use strict"
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { Request, Response } from 'express'
+import { Request, response, Response } from 'express'
 import { classesModel, userModel } from '../../database'
 import { apiResponse, compareHash, generateHash, generateToken, generateUserId, getUniqueOtp, ROLE_TYPES, sendSms } from '../../utils'
 import { createData, getFirstMatch, reqInfo, responseMessage } from '../../helper'
 import { config } from '../../../config'
 import { forgotPasswordSchema, loginSchema, otpVerifySchema, resetPasswordSchema, signUpSchema } from "../../validation"
+import { email_verification_mail } from '../../helper/mail'
 
 const ObjectId = require('mongoose').Types.ObjectId
 const jwt_token_secret = config.JWT_TOKEN_SECRET
@@ -47,6 +48,7 @@ export const signUp = async (req, res) => {
         }
 
         payload.otp = otp;
+        payload.isEmailVerified = false
 
         let response = await createData(userModel, payload);
 
@@ -79,8 +81,16 @@ export const otp_verification = async (req, res) => {
         if (!data) return res.status(400).json(new apiResponse(400, responseMessage?.invalidOTP, {}, {}))
         if (data.isBlocked == true) return res.status(403).json(new apiResponse(403, responseMessage?.accountBlock, {}, {}))
         // if (new Date(data.otpExpireTime).getTime() < new Date().getTime()) return res.status(410).json(new apiResponse(410, responseMessage?.expireOTP, {}, {}))
+        
         if (data) {
-            let response = await userModel.findOneAndUpdate(value, { otp: null, isMobileVerified: true }, { new: true });
+            let response: any
+            if(value?.userType == ROLE_TYPES.USER) {
+                response = await userModel.findOneAndUpdate(value, { otp: null, isMobileVerified: true }, { new: true });
+            } else if (value?.userType == ROLE_TYPES.ADMIN) {
+                response = await userModel.findOneAndUpdate(value, { otp: null, isEmailVerified: true }, { new: true });
+            } else if (value?.userType == ROLE_TYPES.CLASSES) {
+                response = await classesModel.findOneAndUpdate(value, { otp: null, isEmailVerified: true }, { new: true });
+            }
             const token = generateToken({
                 _id: response._id,
                 status: "Login",
@@ -113,11 +123,19 @@ export const login = async (req, res) => {
             return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}));
         }
 
-        response = await userModel.findOne({ $or: [{ email: value?.uniqueId }, { "contact.mobile": value?.uniqueId }], userType: value?.userType }).lean()
-        if (!response) response = await classesModel.findOne({ $or: [{ email: value?.uniqueId }, { "contact.mobile": value?.uniqueId }] }).lean()
+        if(value?.userType == ROLE_TYPES.USER) {
+            response = await userModel.findOne({ "contact.mobile": value?.uniqueId, userType: ROLE_TYPES.USER, isDeleted: false }).lean()
+        } else if (value?.userType == ROLE_TYPES.ADMIN) {
+            response = await userModel.findOne({ email: value?.uniqueId, userType: ROLE_TYPES.ADMIN, isDeleted: false }).lean()
+        } else if (value?.userType == ROLE_TYPES.CLASSES) {
+            response = await classesModel.findOne({ email: value?.uniqueId, userType: ROLE_TYPES.CLASSES, isDeleted: false }).lean()
+        }
 
         if (!response) return res.status(400).json(new apiResponse(400, responseMessage?.userNotFound, {}, {}))
-
+        if(response?.isBlocked == true) return res.status(403).json(new apiResponse(403, responseMessage?.accountBlock, {}, {}))
+        if(response?.isEmailVerified === false) return res.status(403).json(new apiResponse(403, responseMessage?.emailNotVerified, {}, {}))
+        if(response?.isMobileVerified === false) return res.status(403).json(new apiResponse(403, responseMessage?.mobileNotVerified, {}, {}))
+        
         const passwordMatch = await compareHash(value.password, response.password)
         if (!passwordMatch) return res.status(400).json(new apiResponse(400, responseMessage?.invalidUserPasswordEmail, {}, {}))
 
@@ -295,9 +313,19 @@ export const change_user_password = async (req, res) => {
             delete body.newPassword
             body.password = hashPassword
         }
+        let otp = await getUniqueOtp()
+        body.otp = otp
 
-        const response = await userModel.findOneAndUpdate({ _id: new ObjectId(body.userId), isDeleted: false }, body, { new: true })
+        let response = await userModel.findOneAndUpdate({ _id: new ObjectId(body.userId), isDeleted: false }, body, { new: true })
+        if (!response) response = await classesModel.findOneAndUpdate({ _id: new ObjectId(body.userId), isDeleted: false }, body, { new: true })
+        
         if (!response) return res.status(405).json(new apiResponse(405, responseMessage?.updateDataError('user'), {}, {}))
+        
+
+        if (response?.email) {
+            await email_verification_mail(response, otp);
+        }
+
         return res.status(200).json(new apiResponse(200, responseMessage?.updateDataSuccess('user'), response, {}))
     } catch (error) {
         console.log(error);

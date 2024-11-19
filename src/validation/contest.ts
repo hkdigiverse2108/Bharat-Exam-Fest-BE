@@ -2,7 +2,7 @@ import Joi from "joi";
 
 export const addContestSchema = Joi.object().keys({
     name: Joi.string().required(),
-    type: Joi.string().optional(),
+    subTopicId: Joi.string().optional(),
     startDate: Joi.date().optional(),
     endDate: Joi.date().optional(),
     totalSpots: Joi.number().optional(),
@@ -21,7 +21,7 @@ export const addContestSchema = Joi.object().keys({
 export const editContestSchema = Joi.object().keys({
     contestId: Joi.string().required(),
     name: Joi.string().optional(),
-    type: Joi.string().optional(),
+    subTopicId: Joi.string().optional(),
     startDate: Joi.date().optional(),
     endDate: Joi.date().optional(),
     totalSpots: Joi.number().optional(),

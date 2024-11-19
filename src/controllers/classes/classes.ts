@@ -1,5 +1,6 @@
 import { classesModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
+import { email_verification_mail } from "../../helper/mail";
 import { apiResponse, generateHash, getUniqueOtp, ROLE_TYPES } from "../../utils";
 import { addClassesSchema, deleteClassesSchema, editClassesSchema, getClassesSchema } from "../../validation";
 
@@ -22,15 +23,19 @@ export const add_classes = async (req, res) => {
 
         isExist = await classesModel.findOne({ email: value?.email, isDeleted: false })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("Email"), {}, {}))
-        
-        let otp = await getUniqueOtp()
 
+            
+        let otp = await getUniqueOtp()
+        
         value.password = await generateHash(value.password)
         value.userType = ROLE_TYPES.CLASSES
         value.otp = otp
-
+        
         const response = await new classesModel(value).save();
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}))
+        if (response?.email) {
+            await email_verification_mail(response, otp);
+        }
         return res.status(200).json(new apiResponse(200, responseMessage?.addDataSuccess("classes"), response, {}))
     } catch (error) {
         console.log("error", error);

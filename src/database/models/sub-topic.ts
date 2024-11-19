@@ -8,4 +8,4 @@ const subTopicSchema: any = new mongoose.Schema({
     updatedBy: { type: mongoose.Schema.Types.ObjectId, default: null }
 }, { timestamps: true, versionKey: false })
 
-export const subTopicModel = mongoose.model('sub-topic', subTopicSchema);
+export const subTopicModel = mongoose.model('sub-topic', subTopicSchema); 

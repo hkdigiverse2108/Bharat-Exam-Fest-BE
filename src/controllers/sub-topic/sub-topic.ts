@@ -81,9 +81,7 @@ export const get_all_sub_topic = async (req, res) => {
 
         if (search) {
             match.$or = [
-                { name: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { title: { $regex: search, $options: 'i' } }
+                { name: { $regex: search, $options: 'i' } }
             ]
         }
 
@@ -132,10 +130,10 @@ export const get_sub_topic_by_id = async (req, res) => {
     }
 }
 
-export const get_all_sub_topics = async(req, res)=> {
+export const get_all_sub_topics = async (req, res) => {
     reqInfo(req)
     try {
-        let subTopic = await subTopicModel.find({isDeleted: false}).select("name _id")
+        let subTopic = await subTopicModel.find({ isDeleted: false }).select("name _id")
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("sub topic"), subTopic, {}))
     } catch (error) {
         console.log(error);

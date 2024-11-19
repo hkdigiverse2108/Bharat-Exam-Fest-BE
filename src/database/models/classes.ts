@@ -25,6 +25,7 @@ const classesSchema: any = new mongoose.Schema({
     otp: { type: String },
     isDeleted: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
+    isEmailVerified: { type: Boolean, default: false },
     createdBy: { type: mongoose.Schema.Types.ObjectId, default: null },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, default: null }
 }, { timestamps: true, versionKey: false })

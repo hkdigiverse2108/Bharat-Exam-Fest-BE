@@ -1,16 +1,5 @@
 const dotenv = require('dotenv');
 
-// Load environment-specific variables
-if (process.env.ENV === 'dev') {
-  dotenv.config({ path: '.env.dev' });
-} else if (process.env.ENV === 'production') {
-  dotenv.config({ path: '.env.production' });
-} else if (process.env.ENV === 'staging') {
-  dotenv.config({ path: '.env.staging' });
-} else {
-  dotenv.config({ path: '.env.dev' });
-}
-
 export const config = {
   PORT: process.env.PORT,
   DB_URL: process.env.DB_URL,
@@ -30,4 +19,8 @@ export const config = {
   TWIlIO_ACCOUNT_ID: process.env.TWIlIO_ACCOUNT_ID,
   TWIlIO_AUTH_TOKEN: process.env.TWIlIO_AUTH_TOKEN,
   TWIlIO_PHONE_NUMBER: process.env.TWIlIO_PHONE_NUMBER,
+  GMAIL_ACCESS_TOKEN: process.env.GMAIL_ACCESS_TOKEN,
+  GMAIL_REFRESH_TOKEN: process.env.GMAIL_REFRESH_TOKEN,
+  GMAIL_CLIENT_ID: process.env.GMAIL_CLIENT_ID,
+  GMAIL_CLIENT_SECRET: process.env.GMAIL_CLIENT_SECRET,
 }

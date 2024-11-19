@@ -40,8 +40,8 @@ export const BANNER_TYPE = {
 
 export const KYC_STATUS = {
     PENDING: "pending",
-    APPROVED: "approved",
-    REJECTED: "rejected"
+    VERIFIED: "verified",
+    UNVERIFIED: "unverified"
 }
 
 export const ID_PROOF = {

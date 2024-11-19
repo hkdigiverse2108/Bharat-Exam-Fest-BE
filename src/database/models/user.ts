@@ -25,7 +25,8 @@ const userSchema: any = new mongoose.Schema({
     isBlocked: { type: Boolean, default: false },
     createdBy: { type: mongoose.Schema.Types.ObjectId, default: null },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, default: null },
-    isMobileVerified: { type: Boolean, default: false },
+    isMobileVerified: { type: Boolean },
+    isEmailVerified: { type: Boolean },
 }, { timestamps: true, versionKey: false })
 
 export const userModel = mongoose.model('user', userSchema);

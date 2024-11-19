@@ -1668,7 +1668,7 @@
                   "name": {
                     "type": "string"
                   },
-                  "type": {
+                  "subTopicId": {
                     "type": "string"
                   },
                   "startDate": {
@@ -1763,7 +1763,7 @@
                   "name": {
                     "type": "string"
                   },
-                  "type": {
+                  "subTopicId": {
                     "type": "string"
                   },
                   "startDate": {
@@ -1903,6 +1903,15 @@
               "type": "string"
             },
             "description": "Search term to filter contests"
+          },
+          {
+            "name": "subTopicFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sub topic ID to filter contests"
           }
         ],
         "responses": {

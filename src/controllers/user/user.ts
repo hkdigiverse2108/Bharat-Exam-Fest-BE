@@ -3,7 +3,6 @@ import { userModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { addUserSchema, deleteUserSchema, editUserSchema, getUserSchema } from "../../validation";
 
-
 const ObjectId: any = require('mongoose').Types.ObjectId;
 
 export const add_user = async (req, res) => {
@@ -35,6 +34,7 @@ export const add_user = async (req, res) => {
         value.password = await generateHash(value.password)
         value.userType = ROLE_TYPES.USER
         value.otp = otp
+        value.isMobileVerified = false
 
         while (!userId) {
             let temp = generateUserId(prefix);

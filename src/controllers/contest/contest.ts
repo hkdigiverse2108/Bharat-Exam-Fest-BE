@@ -62,7 +62,7 @@ export const delete_contest_by_id = async (req, res) => {
 
 export const get_all_contests = async (req, res) => {
     reqInfo(req);
-    let { page, limit, search } = req.query;
+    let { page, limit, search, subTopicFilter } = req.query;
     let response: any, match: any = {};
 
     try {
@@ -79,8 +79,26 @@ export const get_all_contests = async (req, res) => {
             ]
         }
 
+        if (subTopicFilter) {
+            match.subTopicId = new ObjectId(subTopicFilter)
+        }
+
         response = await contestModel.aggregate([
             { $match: match },
+            {
+                $lookup: {
+                    from: 'sub-topics',
+                    let: { subTopicId: "$subTopicId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$subTopicId"] }] } } },
+                        { $project: { _id: 1, name: 1 } }
+                    ],
+                    as: 'subTopic'
+                }
+            },
+            {
+                $unwind: { path: "$subTopic", preserveNullAndEmptyArrays: true }
+            },
             {
                 $facet: {
                     data: [

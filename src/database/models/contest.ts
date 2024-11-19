@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const contestSchema: any = new mongoose.Schema({
     classesId: { type: mongoose.Schema.Types.ObjectId, ref: "classes", default: null },
     name: { type: String },
-    type: { type: String },
+    subTopicId: { type: mongoose.Schema.Types.ObjectId, ref: "sub-topic", default: null },
     startDate: { type: Date },
     endDate: { type: Date },
     totalSpots: { type: Number },
