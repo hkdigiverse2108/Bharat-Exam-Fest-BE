@@ -49,9 +49,9 @@ export const generateUserId = (prefix) => {
 }
 
 export const typeQuestion = {
-    EASY: 'easy',
-    MEDIUM: 'medium',
-    TOUGH: 'tough'
+    CONCEPT: 'concept',
+    APTITUDE: 'aptitude',
+    RANDOM: 'random'
 }
 
 export const questionType = {
