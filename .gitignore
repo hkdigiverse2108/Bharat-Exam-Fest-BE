@@ -37,6 +37,7 @@ jspm_packages/
 *.ntvs*
 *.njsproj
 *.sln
+images/
 
 # OS generated files
 .DS_Store

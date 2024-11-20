@@ -14,15 +14,50 @@ import router from './routes';
 import swaggerUi from 'swagger-ui-express';
 import * as swaggerDocument from './swagger/swagger.json';
 import { config } from '../config';
+import multer from "multer";
+import fs from 'fs';
+
 const app = express();
+
+const imagesDir = path.join(__dirname, "..", "..", "images");
+if (!fs.existsSync(imagesDir)) {
+  fs.mkdirSync(imagesDir, { recursive: true });
+}
+
+
+app.use("/images", express.static(imagesDir));
+
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}_${file.originalname}`);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname, "views"));
+
 app.use(cors())
 app.use(mongooseConnection)
 app.use(bodyParser.json({ limit: '200mb' }))
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("image"));
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }))
-
 
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -50,11 +85,11 @@ app.get('/isServerUp', (req, res) => {
 });
 
 var options = {}
-let swaggerDocument1:any = swaggerDocument
-app.use('/api-docs', function(req:any, res, next) {
-    swaggerDocument1.host = config.BACKEND_URL;
-    req.swaggerDoc = swaggerDocument1;
-    next();
+let swaggerDocument1: any = swaggerDocument
+app.use('/api-docs', function (req: any, res, next) {
+  swaggerDocument1.host = config.BACKEND_URL;
+  req.swaggerDoc = swaggerDocument1;
+  next();
 }, swaggerUi.serveFiles(swaggerDocument1, options), swaggerUi.setup());
 
 app.use(router)

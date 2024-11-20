@@ -17,6 +17,7 @@ import { illegalityRouter } from "./illegality";
 import { aboutUsRouter } from "./about-us";
 import { kycRouter } from "./kyc";
 import { contestTypeRouter } from "./contest-type";
+import { uploadRouter } from "./upload";
 
 const router = Router()
 
@@ -38,5 +39,6 @@ router.use('/illegality', illegalityRouter)
 router.use('/about-us', aboutUsRouter)
 router.use('/kyc', kycRouter)
 router.use('/contest-type', contestTypeRouter)
+router.use('/upload', uploadRouter)
 
 export default router
