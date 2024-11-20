@@ -147,9 +147,7 @@ export const login = async (req, res) => {
         })
 
         const result: any = {
-            userType: response.userType,
-            _id: response?._id,
-            email: response?.email,
+            ...response,
             token,
         }
 
