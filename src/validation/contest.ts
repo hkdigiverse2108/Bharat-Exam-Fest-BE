@@ -2,7 +2,7 @@ import Joi from "joi";
 
 export const addContestSchema = Joi.object().keys({
     name: Joi.string().required(),
-    subTopicId: Joi.string().optional(),
+    contestTypeId: Joi.string().optional(),
     startDate: Joi.date().optional(),
     endDate: Joi.date().optional(),
     totalSpots: Joi.number().optional(),
@@ -10,7 +10,8 @@ export const addContestSchema = Joi.object().keys({
     winningAmountPerFee: Joi.number().optional(),
     winnerPercentage: Joi.number().optional(),
     ranks: Joi.array().items(Joi.object().keys({
-        place: Joi.string().optional()
+        place: Joi.string().optional(),
+        price: Joi.number().optional()
     })).optional(),
     totalQuestions: Joi.number().optional(),
     totalTime: Joi.string().optional(), // e.g., "2 hours"
@@ -21,7 +22,7 @@ export const addContestSchema = Joi.object().keys({
 export const editContestSchema = Joi.object().keys({
     contestId: Joi.string().required(),
     name: Joi.string().optional(),
-    subTopicId: Joi.string().optional(),
+    contestTypeId: Joi.string().optional(),
     startDate: Joi.date().optional(),
     endDate: Joi.date().optional(),
     totalSpots: Joi.number().optional(),
@@ -29,7 +30,8 @@ export const editContestSchema = Joi.object().keys({
     winningAmountPerFee: Joi.number().optional(),
     winnerPercentage: Joi.number().optional(),
     ranks: Joi.array().items(Joi.object().keys({
-        place: Joi.string().optional()
+        place: Joi.string().optional(),
+        price: Joi.number().optional()
     })).optional(),
     totalQuestions: Joi.number().optional(),
     totalTime: Joi.string().optional(),

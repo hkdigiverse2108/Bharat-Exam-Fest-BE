@@ -150,11 +150,7 @@
                   "userType":{
                     "type": "string"
                   }
-                },
-                "required": [
-                  "email",
-                  "password"
-                ]
+                }
               }
             }
           }
@@ -164,22 +160,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Login successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    },
-                    "userId": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Login successfully"
           },
           "400": {
             "description": "Invalid input"
@@ -1668,7 +1649,7 @@
                   "name": {
                     "type": "string"
                   },
-                  "subTopicId": {
+                  "contestTypeId": {
                     "type": "string"
                   },
                   "startDate": {
@@ -1721,22 +1702,7 @@
         },
         "responses": {
           "200": {
-            "description": "Contest added successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "object"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Contest added successfully"
           },
           "400": {
             "description": "Invalid input"
@@ -1763,7 +1729,7 @@
                   "name": {
                     "type": "string"
                   },
-                  "subTopicId": {
+                  "contestTypeId": {
                     "type": "string"
                   },
                   "startDate": {
@@ -1916,39 +1882,7 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of contests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "contest_data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    },
-                    "totalData": {
-                      "type": "integer"
-                    },
-                    "state": {
-                      "type": "object",
-                      "properties": {
-                        "page": {
-                          "type": "integer"
-                        },
-                        "limit": {
-                          "type": "integer"
-                        },
-                        "page_limit": {
-                          "type": "integer"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "A list of contests"
           },
           "400": {
             "description": "Invalid input"

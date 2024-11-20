@@ -132,8 +132,6 @@ export const login = async (req, res) => {
         }
 
         if (!response) return res.status(400).json(new apiResponse(400, responseMessage?.userNotFound, {}, {}))
-        if(response?.isBlocked == true) return res.status(403).json(new apiResponse(403, responseMessage?.accountBlock, {}, {}))
-        if(response?.isEmailVerified === false) return res.status(403).json(new apiResponse(403, responseMessage?.emailNotVerified, {}, {}))
         if(response?.isMobileVerified === false) return res.status(403).json(new apiResponse(403, responseMessage?.mobileNotVerified, {}, {}))
         
         const passwordMatch = await compareHash(value.password, response.password)
@@ -146,10 +144,22 @@ export const login = async (req, res) => {
             generatedOn: (new Date().getTime())
         })
 
+        if(value?.userType !== ROLE_TYPES.USER) {
+            let otp = await getUniqueOtp()
+    
+            if(response?.email) {
+                await email_verification_mail(response, otp);
+            }
+
+            let isExist = await userModel.findOneAndUpdate({_id: response?._id}, {otp}, {new: true})
+            if(!isExist) isExist = await classesModel.findOneAndUpdate({_id: response?._id}, {otp}, {new: true})
+        }
+
         const result: any = {
             ...response,
             token,
         }
+        delete result.otp
 
         return res.status(200).json(new apiResponse(200, responseMessage?.loginSuccess, result, {}))
 
