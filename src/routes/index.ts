@@ -16,6 +16,7 @@ import { termsConditionRouter } from "./terms-condition";
 import { illegalityRouter } from "./illegality";
 import { aboutUsRouter } from "./about-us";
 import { kycRouter } from "./kyc";
+import { contestTypeRouter } from "./contest-type";
 
 const router = Router()
 
@@ -36,5 +37,6 @@ router.use('/terms-condition', termsConditionRouter)
 router.use('/illegality', illegalityRouter)
 router.use('/about-us', aboutUsRouter)
 router.use('/kyc', kycRouter)
+router.use('/contest-type', contestTypeRouter)
 
 export default router
