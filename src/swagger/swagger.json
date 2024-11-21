@@ -993,6 +993,9 @@
                   "name": {
                     "type": "string"
                   },
+                  "ownerName": {
+                    "type": "string"
+                  },
                   "title": {
                     "type": "string"
                   },
@@ -1074,6 +1077,9 @@
                     "type": "string"
                   },
                   "name": {
+                    "type": "string"
+                  },
+                  "ownerName": {
                     "type": "string"
                   },
                   "title": {

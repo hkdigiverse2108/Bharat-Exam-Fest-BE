@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 
 const classesSchema: any = new mongoose.Schema({
     name: { type: String },
+    ownerName: { type: String },
     title: { type: String },
     contact: {
         countryCode: { type: String },

@@ -3,6 +3,7 @@ import Joi from "joi";
 export const addClassesSchema = Joi.object().keys({
     name: Joi.string().required(),
     title: Joi.string().optional(),
+    ownerName: Joi.string().optional(),
     contact: Joi.object().keys({
         countryCode: Joi.string().optional(),
         mobile: Joi.string().optional()
@@ -24,6 +25,7 @@ export const addClassesSchema = Joi.object().keys({
 export const editClassesSchema = Joi.object().keys({
     classesId: Joi.string().required(),
     name: Joi.string().optional(),
+    ownerName: Joi.string().optional(),
     title: Joi.string().optional(),
     contact: Joi.object().keys({
         countryCode: Joi.string().optional(),
