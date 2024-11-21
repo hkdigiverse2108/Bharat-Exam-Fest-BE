@@ -15,17 +15,10 @@ import swaggerUi from 'swagger-ui-express';
 import * as swaggerDocument from './swagger/swagger.json';
 import { config } from '../config';
 import multer from "multer";
-import fs from 'fs';
 
 const app = express();
 
-const imagesDir = path.join(__dirname, "..", "..", "images");
-if (!fs.existsSync(imagesDir)) {
-  fs.mkdirSync(imagesDir, { recursive: true });
-}
-
-
-app.use("/images", express.static(imagesDir));
+app.use("/images", express.static(path.join(__dirname, ".." , "images")));
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -48,7 +41,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static(path.join(__dirname,".." , "images")));
 
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname, "views"));
