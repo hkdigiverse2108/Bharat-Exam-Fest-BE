@@ -17,8 +17,6 @@ export const add_subject = async (req, res) => {
         value.createdBy = new ObjectId(user._id)
         value.updatedBy = new ObjectId(user._id)
 
-
-
         let isExist = await subjectModel.findOne({ name: value.name, isDeleted: false })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("Subject Name"), {}, {}))
 
@@ -43,17 +41,6 @@ export const edit_subject_by_id = async (req, res) => {
 
         let subject = await subjectModel.findOne({ _id: new ObjectId(value.subjectId) })
         if (!subject) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("subject"), {}, {}))
-
-        const existingSubTopicIds = subject.subTopicIds.map(id => id.toString());
-        const newSubTopicIds = value.subTopicIds.map(id => id.toString());
-        const matchingIds = newSubTopicIds.filter(id => existingSubTopicIds.includes(id));
-
-        if (matchingIds.length > 0) {
-            return res.status(400).json(new apiResponse(400, responseMessage?.dataAlreadyExist("sub topic"), {}, {}))
-        }
-
-        let isExist = await subjectModel.findOne({ name: value.name, isDeleted: false, _id: { $ne: new ObjectId(value.subjectId) } })
-        if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("Subject Name"), {}, {}))
 
         const response = await subjectModel.findOneAndUpdate({ _id: new ObjectId(value.subjectId) }, value, { new: true })
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.updateDataError("subject"), {}, {}))
