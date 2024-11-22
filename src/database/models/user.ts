@@ -19,6 +19,7 @@ const userSchema: any = new mongoose.Schema({
     uniqueId: { type: String },
     upscNumber: { type: String },
     password: { type: String, default: null },
+    profileImage: { type: String, default: null },
     otp: { type: Number, default: null },
     userType: { type: String, enum: Object.values(ROLE_TYPES), default: ROLE_TYPES.USER },
     isDeleted: { type: Boolean, default: false },

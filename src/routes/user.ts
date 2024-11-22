@@ -12,5 +12,6 @@ router.delete('/delete/:id', userController.delete_user_by_id)
 router.get('/all', userController.get_all_users)
 router.get('/:id', userController.get_user_by_id)
 router.get('/', userController.get_all_user)
+router.get('/profile-image/:id', userController.get_profile_image)
 
 export let userRouter = router;

@@ -172,3 +172,15 @@ export const get_all_user = async(req, res) => {
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 }
+
+export const get_profile_image = async(req, res) => {
+    reqInfo(req)
+    try {
+        let response = await userModel.findOne({_id: new ObjectId(req.params.id), isDeleted: false}).select("profileImage")
+        if(!response) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("user"), {}, {}))
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("user"), response, {}))
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
+    }
+}

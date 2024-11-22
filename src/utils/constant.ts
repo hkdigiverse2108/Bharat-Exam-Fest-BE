@@ -50,3 +50,20 @@ export const ID_PROOF = {
     VOTER_ID: "voterId",
     PASSPORT: "passport"
 }
+
+export const Q_A_TYPE = {
+    SURE: "100%Sure",
+    LOGIC_PLAY: "logicPlay",
+    INTUITION_HIT: "intuitionHit",
+    BLIND_FIRE: "blindFire",
+    SKIP: "skip",
+    FEAR_DRIVER_SKIP: "fearDriverSkip"
+}
+
+export const WHY_FALSE = {
+    SILLY_MISTAKE: "sillyMistake",
+    CONCEPT_MISTAKE: "conceptMistake",
+    REVISION_LACKING: "revisionLacking",
+    OUT_OF_MATERIAL: "outOfMaterial",
+    CURRENT_AFFAIR_NOT_READ: "currentAffairNotRead"
+}
