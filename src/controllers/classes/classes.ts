@@ -47,10 +47,10 @@ export const edit_classes_by_id = async (req, res) => {
         }
         value.updatedBy = new ObjectId(user._id)
 
-        let isExist = await classesModel.findOne({ name: value.name, isDeleted: false })
+        let isExist = await classesModel.findOne({ name: value.name, isDeleted: false, _id: { $ne: new ObjectId(value.classesId) } })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("Name"), {}, {}))
 
-        isExist = await classesModel.findOne({ email: value.email, isDeleted: false })
+        isExist = await classesModel.findOne({ email: value.email, isDeleted: false, _id: { $ne: new ObjectId(value.classesId) } })
         if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("Email"), {}, {}))
 
         const response = await classesModel.findOneAndUpdate({ _id: new ObjectId(value.classesId) }, value, { new: true })
