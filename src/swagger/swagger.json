@@ -827,6 +827,9 @@
                   },
                   "password": {
                     "type": "string"
+                  },
+                  "isBlocked": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -1130,6 +1133,9 @@
                         "type": "string"
                       }
                     }
+                  },
+                  "isBlocked": {
+                    "type": "boolean"
                   }
                 }
               }

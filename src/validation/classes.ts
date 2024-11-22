@@ -42,7 +42,8 @@ export const editClassesSchema = Joi.object().keys({
         bankName: Joi.string().optional(),
         upiId: Joi.string().optional(),
         swiftCode: Joi.string().optional()
-    }).optional()
+    }).optional(),
+    isBlocked: Joi.boolean().optional()
 });
 
 export const deleteClassesSchema = Joi.object().keys({
