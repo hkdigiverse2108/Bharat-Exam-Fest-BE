@@ -10,7 +10,8 @@ export const addContestSchema = Joi.object().keys({
     winningAmountPerFee: Joi.number().optional(),
     winnerPercentage: Joi.number().optional(),
     ranks: Joi.array().items(Joi.object().keys({
-        place: Joi.string().optional(),
+        startPlace: Joi.string().optional(),
+        endPlace: Joi.string().optional(),
         price: Joi.number().optional()
     })).optional(),
     totalQuestions: Joi.number().optional(),
@@ -30,7 +31,8 @@ export const editContestSchema = Joi.object().keys({
     winningAmountPerFee: Joi.number().optional(),
     winnerPercentage: Joi.number().optional(),
     ranks: Joi.array().items(Joi.object().keys({
-        place: Joi.string().optional(),
+        startPlace: Joi.string().optional(),
+        endPlace: Joi.string().optional(),
         price: Joi.number().optional()
     })).optional(),
     totalQuestions: Joi.number().optional(),

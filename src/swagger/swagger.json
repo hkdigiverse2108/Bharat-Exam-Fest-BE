@@ -1665,8 +1665,14 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "place": {
+                        "startPlace": {
                           "type": "string"
+                        },
+                        "endPlace": {
+                          "type": "string"
+                        },
+                        "price": {
+                          "type": "number"
                         }
                       }
                     }
@@ -1745,8 +1751,14 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "place": {
+                        "startPlace": {
                           "type": "string"
+                        },
+                        "endPlace": {
+                          "type": "string"
+                        },
+                        "price": {
+                          "type": "number"
                         }
                       }
                     }
