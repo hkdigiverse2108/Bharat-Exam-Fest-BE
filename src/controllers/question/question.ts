@@ -1,5 +1,5 @@
 import { apiResponse, ROLE_TYPES } from "../../utils";
-import { questionModel } from "../../database";
+import { contestModel, qaModel, questionModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { addQuestionSchema, deleteQuestionSchema, editQuestionSchema, getQuestionSchema } from "../../validation";
 
@@ -69,30 +69,30 @@ export const get_all_questions = async (req, res) => {
     try {
         page = Number(page)
         limit = Number(limit)
-        
+
         match.isDeleted = false;
 
-        if(user.userType === ROLE_TYPES.CLASSES){
+        if (user.userType === ROLE_TYPES.CLASSES) {
             match.classesId = new ObjectId(user._id)
         }
 
-        if(subjectFilter){
+        if (subjectFilter) {
             match.subjectId = new ObjectId(subjectFilter)
         }
 
-        if(classesFilter){
+        if (classesFilter) {
             match.classesId = new ObjectId(classesFilter)
         }
 
-        if(subtopicFilter){
+        if (subtopicFilter) {
             match.subtopicId = new ObjectId(subtopicFilter)
         }
 
-        if(questionTypeFilter){
+        if (questionTypeFilter) {
             match.questionType = questionTypeFilter
         }
 
-        if(typeFilter){
+        if (typeFilter) {
             match.type = typeFilter
         }
 
@@ -192,17 +192,17 @@ export const get_question_by_id = async (req, res) => {
 };
 
 
-export const subject_wise_question_count = async(req, res) => {
+export const subject_wise_question_count = async (req, res) => {
     reqInfo(req)
     let { user } = req.headers, match: any = {}
     try {
 
-        if(user.userType === ROLE_TYPES.CLASSES){
+        if (user.userType === ROLE_TYPES.CLASSES) {
             match.classesId = new ObjectId(user._id)
         }
 
         match.isDeleted = false
-        
+
         let response = await questionModel.aggregate([
             { $match: match },
             { $group: { _id: "$subjectId", count: { $sum: 1 } } },
@@ -245,7 +245,7 @@ export const subject_wise_question_count = async(req, res) => {
                     as: 'subTopics'
                 }
             },
-            
+
             {
                 $project: {
                     _id: 1,
@@ -260,5 +260,28 @@ export const subject_wise_question_count = async(req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}
+
+export const get_question_by_contest = async (req, res) => {
+    reqInfo(req)
+    let { contestFilter } = req.query, { user } = req.headers
+    try {
+        let contest = await contestModel.findOne({ _id: new ObjectId(contestFilter) })
+        if (!contest) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest"), {}, {}))
+        
+        let qa = await qaModel.findOne({ contentId: new ObjectId(contestFilter), userId: new ObjectId(user?._id) })
+        if (!qa) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("qa"), {}, {}))
+
+        let questions = await questionModel.aggregate([
+            { $match: { subtopicIds: { $in: [new ObjectId(qa?.subTopicId)] }, subjectId: new ObjectId(qa?.subjectId) } },
+            { $sample: { size: contest.totalQuestions } } // Randomly select totalQuestions
+        ]);
+        
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess(""), questions, {}))
+
+    } catch (error) {
+        console.log("error => ", error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 }

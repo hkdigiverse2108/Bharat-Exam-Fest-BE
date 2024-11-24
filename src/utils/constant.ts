@@ -67,3 +67,22 @@ export const WHY_FALSE = {
     OUT_OF_MATERIAL: "outOfMaterial",
     CURRENT_AFFAIR_NOT_READ: "currentAffairNotRead"
 }
+
+export const TYPE_QUESTION = {
+    CONCEPT: 'concept',
+    APTITUDE: 'aptitude',
+    RANDOM: 'random'
+}
+
+export const QUESTION_TYPE = {
+    NORMAL: 'normal',
+    STATEMENT: 'statement',
+    PAIR: 'pair'
+}
+
+export const QUESTION_ANSWER = {
+    A: 'A',
+    B: 'B',
+    C: 'C',
+    D: 'D'
+}

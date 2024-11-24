@@ -18,6 +18,7 @@ import { aboutUsRouter } from "./about-us";
 import { kycRouter } from "./kyc";
 import { contestTypeRouter } from "./contest-type";
 import { uploadRouter } from "./upload";
+import { qaRouter } from "./qa";
 
 const router = Router()
 
@@ -40,5 +41,6 @@ router.use('/about-us', aboutUsRouter)
 router.use('/kyc', kycRouter)
 router.use('/contest-type', contestTypeRouter)
 router.use('/upload', uploadRouter)
+router.use('/qa', qaRouter)
 
 export default router

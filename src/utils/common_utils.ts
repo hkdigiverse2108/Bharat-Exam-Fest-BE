@@ -48,25 +48,6 @@ export const generateUserId = (prefix) => {
     return userId;
 }
 
-export const typeQuestion = {
-    CONCEPT: 'concept',
-    APTITUDE: 'aptitude',
-    RANDOM: 'random'
-}
-
-export const questionType = {
-    NORMAL: 'normal',
-    STATEMENT: 'statement',
-    PAIR: 'pair'
-}
-
-export const questionAnswer = {
-    A: 'A',
-    B: 'B',
-    C: 'C',
-    D: 'D'
-}
-
 export const sendSms = async (to: string, otp) => {
     try {
         const message = await client.messages.create({

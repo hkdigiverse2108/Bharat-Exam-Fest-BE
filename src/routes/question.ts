@@ -9,5 +9,6 @@ router.delete('/delete/:id', questionController.delete_question_by_id)
 router.get('/all', questionController.get_all_questions)
 router.get('/subject-wise-question-count', questionController.subject_wise_question_count)
 router.get('/:id', questionController.get_question_by_id)
+router.get("/contest", questionController.get_question_by_contest)
 
 export let questionRouter = router;

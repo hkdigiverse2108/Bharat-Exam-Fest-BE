@@ -20,4 +20,4 @@ router.post("", (req: any, res: any) => {
     }
 })
 
-export const uploadRouter = router
+export let uploadRouter = router

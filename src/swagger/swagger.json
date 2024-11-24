@@ -1318,6 +1318,21 @@
                       "question": {
                         "type": "string"
                       },
+                      "statementQuestion": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "pairQuestion": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "lastQuestion": {
+                        "type": "string"
+                      },
                       "options": {
                         "type": "object",
                         "properties": {
@@ -1347,6 +1362,21 @@
                     "type": "object",
                     "properties": {
                       "question": {
+                        "type": "string"
+                      },
+                      "statementQuestion": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "pairQuestion": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "lastQuestion": {
                         "type": "string"
                       },
                       "options": {
@@ -1432,6 +1462,21 @@
                       "question": {
                         "type": "string"
                       },
+                      "statementQuestion": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "pairQuestion": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "lastQuestion": {
+                        "type": "string"
+                      },
                       "options": {
                         "type": "object",
                         "properties": {
@@ -1461,6 +1506,21 @@
                     "type": "object",
                     "properties": {
                       "question": {
+                        "type": "string"
+                      },
+                      "statementQuestion": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "pairQuestion": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "lastQuestion": {
                         "type": "string"
                       },
                       "options": {
@@ -1653,6 +1713,30 @@
         "responses": {
           "200": {
             "description": "Subject wise question count"
+          }
+        }
+      }
+    },
+    "/question/contest": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "contestFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest Id to filter contests"
+          }
+        ],
+        "description": "Get contest wise question",
+        "responses": {
+          "200": {
+            "description": "Contest wise question count"
           }
         }
       }
@@ -3020,6 +3104,153 @@
           },
           "400": {
             "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/qa/add": {
+      "post": {
+        "tags": ["QA"],
+        "description": "Add a new 'QA' entry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contestId": {
+                    "type": "string"
+                  },
+                  "classesId": {
+                    "type": "string"
+                  },
+                  "subTopicId": {
+                    "type": "string"
+                  },
+                  "stackNumber": {
+                    "type": "number"
+                  },
+                  "contestStartDate": {
+                    "type": "string"
+                  },
+                  "contestEndDate": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "qa entry added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/qa/edit": {
+      "post": {
+        "tags": ["QA"],
+        "description": "Add a new 'QA' edit",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "qaId": {
+                    "type": "string"
+                  },
+                  "answers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "questionId": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "is2XStack": {
+                          "type": "boolean"
+                        },
+                        "answer": {
+                          "type": "string"
+                        },
+                        "whyFalse": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "contestStartDate": {
+                    "type": "string"
+                  },
+                  "contestEndDate": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "qa entry added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/qa/all": {
+      "get": {
+        "tags": ["QA"],
+        "summary": "Get all qa entries",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of banners"
+          },
+          "404": {
+            "description": "Banners not found"
           },
           "500": {
             "description": "Internal server error"
