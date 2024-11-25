@@ -3128,6 +3128,9 @@
                   "classesId": {
                     "type": "string"
                   },
+                  "subjectId": {
+                    "type": "string"
+                  },
                   "subTopicId": {
                     "type": "string"
                   },
@@ -3184,7 +3187,8 @@
                           "type": "string"
                         },
                         "is2XStack": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "default": false
                         },
                         "answer": {
                           "type": "string"
@@ -3243,6 +3247,34 @@
               "default": 10
             },
             "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of banners"
+          },
+          "404": {
+            "description": "Banners not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/qa/contest/question": {
+      "get": {
+        "tags": ["QA"],
+        "summary": "Get contest questions entries",
+        "parameters": [
+          {
+            "name": "contestFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest ID add"
           }
         ],
         "responses": {

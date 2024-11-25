@@ -1,4 +1,4 @@
-import { qaModel, questionModel } from "../../database"
+import { contestModel, qaModel, questionModel } from "../../database"
 import { reqInfo, responseMessage } from "../../helper"
 import { apiResponse, ROLE_TYPES } from "../../utils"
 
@@ -17,6 +17,32 @@ export const add_qa = async (req, res) => {
         body.updatedBy = new ObjectId(user._id)
 
         body.userId = new ObjectId(user._id)
+
+        let qa = await qaModel.findOne({contestId: new ObjectId(body.contestId), userId: new ObjectId(user._id)})
+        if(qa) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("contest"), {}, {}))
+
+        let contest = await contestModel.findOne({ _id: new ObjectId(body.contestId) })
+        if (!contest) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest"), {}, {}))
+        
+        if(!body.subjectId) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("subject"), {}, {}))
+                
+        if(!body.subTopicId) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("sub topic"), {}, {}))
+
+        let questions = await questionModel.aggregate([
+            { $match: { subtopicIds: { $in: [new ObjectId(body?.subTopicId)] }, subjectId: new ObjectId(body?.subjectId), isDeleted: false } },
+            { $sample: { size: contest.totalQuestions } } // Randomly select totalQuestions
+        ]);
+        
+        let answers = []
+        for (let i = 0; i < questions.length; i++) {
+            let question = questions[i];
+            let answer = {
+                questionId: new ObjectId(question._id)
+            }
+            answers.push(answer)
+        }
+
+        body.answers = answers
 
         const response = await new qaModel(body).save();
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}))
@@ -39,12 +65,12 @@ export const edit_qa_by_id = async (req, res) => {
 
         body.updatedBy = new ObjectId(user._id)
 
-        if(body.answers){
+        if (body.answers) {
             let totalPoints = 0, totalRightAnswer = 0, totalWrongAnswer = 0, totalSkippedAnswer = 0;
             for (let i = 0; i < body.answers.length; i++) {
                 let answer = body.answers[i]
                 let question = await questionModel.findOne({ _id: new ObjectId(answer.questionId) })
-    
+
                 if (question && answer.answer && question.englishQuestion.answer === answer.answer) {
                     answer.isAnsweredTrue = true
                     if (answer.is2XStack) {
@@ -67,14 +93,14 @@ export const edit_qa_by_id = async (req, res) => {
                     answer.isAnsweredTrue = null
                 }
             }
-    
+
             body.totalPoints = totalPoints;
             body.totalRightAnswer = totalRightAnswer;
             body.totalWrongAnswer = totalWrongAnswer;
             body.totalSkippedAnswer = totalSkippedAnswer;
         }
 
-        const response = await qaModel.findOneAndUpdate({ _id: ObjectId(body.qaId) }, body, {new : true}).save();
+        const response = await qaModel.findOneAndUpdate({ _id: ObjectId(body.qaId) }, body, { new: true }).save();
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}))
 
         return res.status(200).json(new apiResponse(200, responseMessage?.addDataSuccess("question"), response, {}))
@@ -91,8 +117,8 @@ export const get_all_qa = async (req, res) => {
     try {
         page = Number(page)
         limit = Number(limit)
-        
-        if (user.userType === ROLE_TYPES.USER){
+
+        if (user.userType === ROLE_TYPES.USER) {
             match.userId = new ObjectId(user._id)
         }
 
@@ -164,5 +190,19 @@ export const get_all_qa = async (req, res) => {
     } catch (error) {
         console.log("error=> ", error)
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}
+
+export const get_user_contest_question_by_id = async(req, res) => {
+    reqInfo(req)
+    let { user } = req.headers
+    let { contestFilter } = req.query
+    try {
+        let qa = await qaModel.findOne({contestId: new ObjectId(contestFilter), userId: new ObjectId(user._id)}).populate('answers.questionId')
+        if(!qa) return res.status(405).json(new apiResponse(405, responseMessage?.getDataNotFound("qa"), {}, {}))
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), qa, {}))
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 }
