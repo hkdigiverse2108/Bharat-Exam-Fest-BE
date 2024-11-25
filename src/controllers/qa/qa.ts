@@ -89,7 +89,9 @@ export const get_all_qa = async (req, res) => {
     let { page, limit, search } = req.query;
     let response: any, match: any = {}, { user } = req.headers;
     try {
-
+        page = Number(page)
+        limit = Number(limit)
+        
         if (user.userType === ROLE_TYPES.USER){
             match.userId = new ObjectId(user._id)
         }
