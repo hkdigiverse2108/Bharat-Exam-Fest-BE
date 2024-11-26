@@ -149,6 +149,19 @@ export const get_all_qa = async (req, res) => {
                 $unwind: { path: "$classes", preserveNullAndEmptyArrays: true }
             },
             {
+                $lookup: {
+                    from: 'subjects',
+                    let: { subjectId: "$subjectId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$subjectId"] }] } } },
+                    ],
+                    as: 'subject'
+                }
+            },
+            {
+                $unwind: { path: "$subject", preserveNullAndEmptyArrays: true }
+            },
+            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },
