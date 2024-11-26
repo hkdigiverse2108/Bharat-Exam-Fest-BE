@@ -677,22 +677,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Subject details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Subject details"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/subject/subtopic/{subjectId}": {
+      "get": {
+        "tags": [
+          "Subject"
+        ],
+        "description": "Get subjects by sub-topic ID",
+        "parameters": [
+          {
+            "name": "subjectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of subjects"
           },
           "400": {
             "description": "Invalid input"
@@ -1242,7 +1253,16 @@
             "schema": {
               "type": "string"
             },
-            "description": "Search term to filter classes"
+            "description": "Search term to filter classes upcoming, ongoing, completed"
+          },
+          {
+            "name": "contestFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter contests by date"
           }
         ],
         "responses": {
@@ -1991,13 +2011,22 @@
             "description": "Search term to filter contests"
           },
           {
-            "name": "subTopicFilter",
+            "name": "subjectId",
             "in": "query",
             "required": false,
             "schema": {
               "type": "string"
             },
-            "description": "Sub topic ID to filter contests"
+            "description": "Subject ID to filter contests"
+          },
+          {
+            "name": "contestFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest filter to filter contests upcoming, ongoing, completed"
           }
         ],
         "responses": {
@@ -3247,6 +3276,15 @@
               "default": 10
             },
             "description": "Number of items per page"
+          },
+          {
+            "name": "contestFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest filter to filter contests upcoming, ongoing, completed"
           }
         ],
         "responses": {

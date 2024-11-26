@@ -21,7 +21,7 @@ export const add_qa = async (req, res) => {
         let qa = await qaModel.findOne({contestId: new ObjectId(body.contestId), userId: new ObjectId(user._id), isDeleted: false})
         if(qa) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("contest"), {}, {}))
 
-        let contest = await contestModel.findOne({ _id: new ObjectId(body.contestId) })
+        let contest = await contestModel.findOneAndUpdate({ _id: new ObjectId(body.contestId) }, { $inc: { filledSpots: 1 } }, { new: true })
         if (!contest) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest"), {}, {}))
         
         if(!body.subjectId) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("subject"), {}, {}))
@@ -42,10 +42,6 @@ export const edit_qa_by_id = async (req, res) => {
     reqInfo(req)
     let { user } = req.headers, body = req.body
     try {
-        // const { error, value } = addClassesSchema.validate(req.body)
-        // if (error) {
-        //     return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}))
-        // }
 
         body.updatedBy = new ObjectId(user._id)
 
@@ -96,7 +92,7 @@ export const edit_qa_by_id = async (req, res) => {
 
 export const get_all_qa = async (req, res) => {
     reqInfo(req);
-    let { page, limit, search } = req.query;
+    let { page, limit, search, contestFilter } = req.query;
     let response: any, match: any = {}, { user } = req.headers;
     try {
         page = Number(page)
@@ -104,6 +100,16 @@ export const get_all_qa = async (req, res) => {
 
         if (user.userType === ROLE_TYPES.USER) {
             match.userId = new ObjectId(user._id)
+        }
+
+        if(contestFilter){
+            if(contestFilter === "upcoming"){
+                match["contest.contestStartDate"] = { $gte: new Date() }
+            }else if(contestFilter === "ongoing"){
+                match["contest.contestEndDate"] = { $lte: new Date() }
+            }else if(contestFilter === "completed"){
+                match["contest.contestEndDate"] = { $lt: new Date() }
+            }
         }
 
         response = await qaModel.aggregate([
@@ -134,6 +140,11 @@ export const get_all_qa = async (req, res) => {
             },
             {
                 $unwind: { path: "$contest", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $addFields: {
+                    pricePool: { $divide: [{ $multiply: ["$contest.totalSpots", "$contest.fees"] }, 2] }
+                }
             },
             {
                 $lookup: {
@@ -173,7 +184,7 @@ export const get_all_qa = async (req, res) => {
             }
         ])
 
-        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("contest type"), {
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), {
             contest_type_data: response[0]?.data || [],
             totalData: response[0]?.data_count[0]?.count || 0,
             state: {

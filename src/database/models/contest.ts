@@ -6,7 +6,8 @@ const contestSchema: any = new mongoose.Schema({
     contestTypeId: { type: mongoose.Schema.Types.ObjectId, ref: "contest-type", default: null },
     startDate: { type: Date },
     endDate: { type: Date },
-    totalSpots: { type: Number },
+    totalSpots: { type: Number, default: 0 },
+    filledSpots: { type: Number, default: 0 },
     fees: { type: Number },
     winningAmountPerFee: { type: Number },
     ranks: [

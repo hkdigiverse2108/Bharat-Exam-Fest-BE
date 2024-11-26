@@ -150,3 +150,15 @@ export const get_all_subjects = async (req, res) => {
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
+
+export const subtopic_wise_subjects = async (req, res) => {
+    reqInfo(req)
+    let { subjectId } = req.params
+    try {
+        let response = await subjectModel.find({ _id: new ObjectId(subjectId), isDeleted: false }).populate("subTopicIds")
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("subject"), response, {}))
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}

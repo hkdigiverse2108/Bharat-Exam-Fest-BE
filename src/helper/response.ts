@@ -50,6 +50,7 @@ export const responseMessage = {
     encryptionError: "Please pass a valid decryption string!",
     accessDenied: "Access denied",
     invalidToken: "Invalid token",
+    insufficientBalance: "Insufficient balance!",
     customMessage: (message: string): any => { return `${message[0].toUpperCase() + message.slice(1).toLowerCase()}` },
     invalidId: (message: string): any => { return `invalid ${message}!` },
     dataAlreadyExist: (message: any): any => { return `Please change ${message}, ${message} is already exists!` },

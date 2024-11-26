@@ -62,7 +62,7 @@ export const delete_contest_by_id = async (req, res) => {
 
 export const get_all_contests = async (req, res) => {
     reqInfo(req);
-    let { page, limit, search, subTopicFilter } = req.query;
+    let { page, limit, search, subTopicFilter, contestFilter } = req.query;
     let response: any, match: any = {};
 
     try {
@@ -77,6 +77,18 @@ export const get_all_contests = async (req, res) => {
                 { email: { $regex: search, $options: 'i' } },
                 { "contact.mobile": { $regex: search, $options: 'i' } }
             ]
+        }
+
+        if (contestFilter) {
+            if (contestFilter === "upcoming") {
+                match["contest.contestStartDate"] = { $gte: new Date() }
+            } 
+            else if (contestFilter === "ongoing") {
+                match["contest.contestEndDate"] = { $lte: new Date() }
+            }
+            else if (contestFilter === "completed") {
+                match["contest.contestEndDate"] = { $lt: new Date() }
+            }
         }
 
         if (subTopicFilter) {
@@ -98,6 +110,11 @@ export const get_all_contests = async (req, res) => {
             },
             {
                 $unwind: { path: "$subTopic", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $addFields: {
+                    pricePool: { $divide: [{ $multiply: ["$totalSpots", "$fees"] }, 2] }
+                }
             },
             {
                 $facet: {

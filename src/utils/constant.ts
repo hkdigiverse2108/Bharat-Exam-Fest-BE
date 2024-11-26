@@ -86,3 +86,13 @@ export const QUESTION_ANSWER = {
     C: 'C',
     D: 'D'
 }
+
+export const TRANSACTION_TYPE = {
+    DEPOSIT: "deposit",
+    WITHDRAW: "withdraw"
+}
+
+export const TRANSACTION_STATUS = {
+    SUCCESS: "success",
+    FAILED: "failed"
+}
