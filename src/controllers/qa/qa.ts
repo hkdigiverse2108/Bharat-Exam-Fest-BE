@@ -128,7 +128,6 @@ export const get_all_qa = async (req, res) => {
                     let: { contestId: "$contestId" },
                     pipeline: [
                         { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestId"] }] } } },
-                        { $project: { _id: 1, name: 1 } }
                     ],
                     as: 'contest'
                 }
@@ -142,7 +141,6 @@ export const get_all_qa = async (req, res) => {
                     let: { classesId: "$classesId" },
                     pipeline: [
                         { $match: { $expr: { $and: [{ $eq: ["$_id", "$$classesId"] }] } } },
-                        { $project: { _id: 1, name: 1 } }
                     ],
                     as: 'classes'
                 }
