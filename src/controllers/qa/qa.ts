@@ -18,7 +18,7 @@ export const add_qa = async (req, res) => {
 
         body.userId = new ObjectId(user._id)
 
-        let qa = await qaModel.findOne({contestId: new ObjectId(body.contestId), userId: new ObjectId(user._id)})
+        let qa = await qaModel.findOne({contestId: new ObjectId(body.contestId), userId: new ObjectId(user._id), isDeleted: false})
         if(qa) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("contest"), {}, {}))
 
         let contest = await contestModel.findOne({ _id: new ObjectId(body.contestId) })
@@ -27,22 +27,6 @@ export const add_qa = async (req, res) => {
         if(!body.subjectId) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("subject"), {}, {}))
                 
         if(!body.subTopicId) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("sub topic"), {}, {}))
-
-        let questions = await questionModel.aggregate([
-            { $match: { subtopicIds: { $in: [new ObjectId(body?.subTopicId)] }, subjectId: new ObjectId(body?.subjectId), isDeleted: false } },
-            { $sample: { size: contest.totalQuestions } } // Randomly select totalQuestions
-        ]);
-        
-        let answers = []
-        for (let i = 0; i < questions.length; i++) {
-            let question = questions[i];
-            let answer = {
-                questionId: new ObjectId(question._id)
-            }
-            answers.push(answer)
-        }
-
-        body.answers = answers
 
         const response = await new qaModel(body).save();
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}))
@@ -198,8 +182,18 @@ export const get_user_contest_question_by_id = async(req, res) => {
     let { user } = req.headers
     let { contestFilter } = req.query
     try {
-        let qa = await qaModel.findOne({contestId: new ObjectId(contestFilter), userId: new ObjectId(user._id)}).populate('answers.questionId')
+        let qa = await qaModel.findOne({contestId: new ObjectId(contestFilter), userId: new ObjectId(user._id)}).lean()
         if(!qa) return res.status(405).json(new apiResponse(405, responseMessage?.getDataNotFound("qa"), {}, {}))
+        
+        let contest = await contestModel.findOne({ _id: new ObjectId(qa.contestId), isDeleted: false }).lean()
+        if (!contest) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest"), {}, {}))
+
+        let questions = await questionModel.aggregate([
+            { $match: { subtopicIds: { $in: [new ObjectId(qa?.subTopicId)] }, subjectId: new ObjectId(qa?.subjectId), isDeleted: false } },
+            { $sample: { size: contest.totalQuestions } }
+        ]);
+
+        qa.answers = questions
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), qa, {}))
     } catch (error) {
         console.log(error);
