@@ -6,13 +6,13 @@
   },
   "servers": [
     {
+      "url": "https://api-bef.hkdigiverse.com"
+    },
+    {
       "url": "http://localhost:4000"
     },
     {
       "url": "http://62.72.58.17"
-    },
-    {
-      "url": "https://api-bef.hkdigiverse.com"
     }
   ],
   "components": {
