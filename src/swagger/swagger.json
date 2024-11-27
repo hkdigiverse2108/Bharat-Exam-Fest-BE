@@ -2027,6 +2027,33 @@
               "type": "string"
             },
             "description": "Contest filter to filter contests upcoming, ongoing, completed"
+          },
+          {
+            "name": "pricePoolFilter[min]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Minimum price pool filter"
+          },
+          {
+            "name": "pricePoolFilter[max]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Maximum price pool filter"
+          },
+          {
+            "name": "contestTypeFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest type filter to filter contests upcoming, ongoing, completed"
           }
         ],
         "responses": {
@@ -3285,6 +3312,69 @@
               "type": "string"
             },
             "description": "Contest filter to filter contests upcoming, ongoing, completed"
+          },
+          {
+            "name": "pricePoolFilter[min]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Minimum price pool filter"
+          },
+          {
+            "name": "pricePoolFilter[max]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Maximum fees filter"
+          },
+          {
+            "name": "feesFilter[min]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Minimum fees filter"
+          },
+          {
+            "name": "feesFilter[max]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Maximum fees filter"
+          },
+          {
+            "name": "sportFilter[min]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Minimum sport filter"
+          },
+          {
+            "name": "sportFilter[max]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Maximum sport filter"
+          },
+          {
+            "name": "contestTypeFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest type filter"
           }
         ],
         "responses": {
@@ -3321,6 +3411,150 @@
           },
           "404": {
             "description": "Banners not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/transaction/add": {
+      "post": {
+        "tags": ["Transaction"],
+        "summary": "Add a new transaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contestId": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "transactionStatus": {
+                    "type": "string"
+                  },
+                  "transactionId": {
+                    "type": "string"
+                  }
+                },
+                "required": ["contestId", "amount"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/transaction/delete/{id}": {
+      "delete": {
+        "tags": ["Transaction"],
+        "summary": "Delete a transaction by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction deleted successfully"
+          },
+          "404": {
+            "description": "Transaction not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/transaction/all": {
+      "get": {
+        "tags": ["Transaction"],
+        "summary": "Get all transactions",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "transactionStatusFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Transaction filter on this status upcoming, ongoing, completed"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of transactions"
+          },
+          "404": {
+            "description": "Transactions not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/transaction/{id}": {
+      "get": {
+        "tags": ["Transaction"],
+        "summary": "Get a transaction by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction details"
+          },
+          "404": {
+            "description": "Transaction not found"
           },
           "500": {
             "description": "Internal server error"

@@ -1,4 +1,4 @@
-import { apiResponse } from "../../utils";
+import { apiResponse, generateHourlySlots } from "../../utils";
 import { contestModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { addContestSchema, deleteContestSchema, editContestSchema, getContestSchema } from "../../validation";
@@ -7,16 +7,23 @@ const ObjectId: any = require('mongoose').Types.ObjectId;
 
 export const add_contest = async (req, res) => {
     reqInfo(req);
-    let { user } = req.headers
+    let { user } = req.headers;
     try {
         const { error, value } = addContestSchema.validate(req.body);
         if (error) {
             return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}));
         }
 
-        value.createdBy = new ObjectId(user?._id)
-        value.updatedBy = new ObjectId(user?._id)
+        value.createdBy = new ObjectId(user?._id);
+        value.updatedBy = new ObjectId(user?._id);
 
+        if (value.startDate && value.endDate) {
+            const startDate = new Date(value.startDate);
+            const endDate = new Date(value.endDate);
+            const slots = generateHourlySlots(startDate, endDate);
+            value.slots = slots; // Assuming you want to store these slots in the contest model
+        }
+        console.log("value.slots => ", value.slots);
         const response = await new contestModel(value).save();
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}));
         return res.status(200).json(new apiResponse(200, responseMessage?.addDataSuccess("contest"), response, {}));
@@ -35,6 +42,12 @@ export const edit_contest_by_id = async (req, res) => {
             return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}));
         }
         value.updatedBy = new ObjectId(user?._id)
+        if (value.startDate && value.endDate) {
+            const startDate = new Date(value.startDate);
+            const endDate = new Date(value.endDate);
+            const slots = generateHourlySlots(startDate, endDate);
+            value.slots = slots; // Assuming you want to store these slots in the contest model
+        }
         const response = await contestModel.findOneAndUpdate({ _id: new ObjectId(value._id), isDeleted: false }, value, { new: true });
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.updateDataError("contest"), {}, {}));
         return res.status(200).json(new apiResponse(200, responseMessage?.updateDataSuccess("contest"), response, {}));
@@ -62,8 +75,8 @@ export const delete_contest_by_id = async (req, res) => {
 
 export const get_all_contests = async (req, res) => {
     reqInfo(req);
-    let { page, limit, search, subTopicFilter, contestFilter } = req.query;
-    let response: any, match: any = {};
+    let { page, limit, search, subTopicFilter, contestFilter, pricePoolFilter, contestTypeFilter, feesFilter, sportFilter } = req.query;
+    let response: any, match: any = {}, match2: any = {};
 
     try {
         page = Number(page)
@@ -72,27 +85,40 @@ export const get_all_contests = async (req, res) => {
 
         if (search) {
             match.$or = [
-                { firstName: { $regex: search, $options: 'i' } },
-                { lastName: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { "contact.mobile": { $regex: search, $options: 'i' } }
+                { "firstName": { $regex: search, $options: 'i' } }
             ]
         }
 
         if (contestFilter) {
             if (contestFilter === "upcoming") {
-                match["contest.contestStartDate"] = { $gte: new Date() }
-            } 
+                match.startDate = { $gte: new Date() }
+            }
             else if (contestFilter === "ongoing") {
-                match["contest.contestEndDate"] = { $lte: new Date() }
+                match.endDate = { $lte: new Date() }
             }
             else if (contestFilter === "completed") {
-                match["contest.contestEndDate"] = { $lt: new Date() }
+                match.endDate = { $lt: new Date() }
             }
         }
 
         if (subTopicFilter) {
             match.subTopicId = new ObjectId(subTopicFilter)
+        }
+
+        if (pricePoolFilter) {
+            match.pricePool = { $gte: Number(pricePoolFilter.min), $lte: Number(pricePoolFilter.max) }
+        }
+
+        if (contestTypeFilter) {
+            match2["contest-type.name"] = contestTypeFilter
+        }
+
+        if (feesFilter) {
+            match.fees = { $gte: Number(feesFilter.min), $lte: Number(feesFilter.max) }
+        }
+
+        if (sportFilter) {
+            match.totalSpots = { $gte: Number(sportFilter.min), $lte: Number(sportFilter.max) }
         }
 
         response = await contestModel.aggregate([
@@ -112,9 +138,18 @@ export const get_all_contests = async (req, res) => {
                 $unwind: { path: "$subTopic", preserveNullAndEmptyArrays: true }
             },
             {
-                $addFields: {
-                    pricePool: { $divide: [{ $multiply: ["$totalSpots", "$fees"] }, 2] }
+                $lookup: {
+                    from: 'contest-types',
+                    let: { contestTypeId: "$contestTypeId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestTypeId"] }] } } },
+                        { $project: { _id: 1, name: 1 } }
+                    ],
+                    as: 'contest-type'
                 }
+            },
+            {
+                $unwind: { path: "$contest-type", preserveNullAndEmptyArrays: true }
             },
             {
                 $facet: {

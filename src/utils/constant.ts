@@ -96,3 +96,15 @@ export const TRANSACTION_STATUS = {
     SUCCESS: "success",
     FAILED: "failed"
 }
+
+export function generateHourlySlots(startDate: Date, endDate: Date): string[] {
+    const slots: string[] = [];
+    let current = new Date(startDate);
+
+    while (current < endDate) {
+        slots.push(current.toISOString().replace('T', ' ').substring(0, 19));
+        current.setHours(current.getHours() + 1);
+    }
+
+    return slots;
+}

@@ -54,7 +54,7 @@ export const delete_transaction_by_id = async (req, res) => {
 
 export const get_all_transaction = async (req, res) => {
     reqInfo(req)
-    let match: any = {}, { page, limit, search } = req.query
+    let match: any = {}, { page, limit, search, transactionStatusFilter } = req.query
     try {
         page = Number(page)
         limit = Number(limit)
@@ -63,12 +63,27 @@ export const get_all_transaction = async (req, res) => {
 
         if (search) {
             match.$or = [
-                { name: { $regex: search, $options: 'i' } }
+                { transactionId: { $regex: search, $options: 'si' } }
             ]
+        }
+
+        if(transactionStatusFilter){
+            match.transactionStatus = transactionStatusFilter
         }
 
         const response = await transactionModel.aggregate([
             { $match: match },
+            {
+                $lookup: {
+                    from: 'contests',
+                    let: { contestId: "$contestId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestId"] }] } } },
+                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
+                    ],
+                    as: 'contest'
+                }
+            },
             {
                 $facet: {
                     data: [

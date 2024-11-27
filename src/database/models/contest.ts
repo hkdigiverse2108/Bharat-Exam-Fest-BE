@@ -10,13 +10,15 @@ const contestSchema: any = new mongoose.Schema({
     filledSpots: { type: Number, default: 0 },
     fees: { type: Number },
     winningAmountPerFee: { type: Number },
+    pricePool: { type: Number, default: 0 },
     ranks: [
         {
-            startPlace: { type: String, default: null }, 
-            endPlace: { type: String, default: null }, 
-            price: { type: Number, default: null } 
+            startPlace: { type: String, default: null },
+            endPlace: { type: String, default: null },
+            price: { type: Number, default: null }
         }
     ],
+    slots: [{ type: Date }],
     winnerPercentage: { type: Number },
     totalQuestions: { type: Number },
     totalTime: { type: String },
