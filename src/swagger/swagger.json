@@ -2029,6 +2029,15 @@
             "description": "Contest filter to filter contests upcoming, ongoing, completed"
           },
           {
+            "name": "contestTypeFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest type filter"
+          },
+          {
             "name": "pricePoolFilter[min]",
             "in": "query",
             "required": false,
@@ -2044,16 +2053,43 @@
             "schema": {
               "type": "number"
             },
-            "description": "Maximum price pool filter"
+            "description": "Maximum fees filter"
           },
           {
-            "name": "contestTypeFilter",
+            "name": "feesFilter[min]",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "number"
             },
-            "description": "Contest type filter to filter contests upcoming, ongoing, completed"
+            "description": "Minimum fees filter"
+          },
+          {
+            "name": "feesFilter[max]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Maximum fees filter"
+          },
+          {
+            "name": "sportFilter[min]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Minimum sport filter"
+          },
+          {
+            "name": "sportFilter[max]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Maximum sport filter"
           }
         ],
         "responses": {
@@ -3314,6 +3350,15 @@
             "description": "Contest filter to filter contests upcoming, ongoing, completed"
           },
           {
+            "name": "contestTypeFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest type filter"
+          },
+          {
             "name": "pricePoolFilter[min]",
             "in": "query",
             "required": false,
@@ -3366,15 +3411,6 @@
               "type": "number"
             },
             "description": "Maximum sport filter"
-          },
-          {
-            "name": "contestTypeFilter",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Contest type filter"
           }
         ],
         "responses": {

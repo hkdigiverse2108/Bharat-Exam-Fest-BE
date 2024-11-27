@@ -121,12 +121,12 @@ export const get_all_qa = async (req, res) => {
             }
         }
 
-        if (pricePoolFilter) {
-            match2["contest.pricePool"] = { $gte: Number(pricePoolFilter.min), $lte: Number(pricePoolFilter.max) }
-        }
-
         if (contestTypeFilter) {
             match2["contest.contest-type.name"] = contestTypeFilter
+        }
+
+        if (pricePoolFilter) {
+            match2["contest.pricePool"] = { $gte: Number(pricePoolFilter.min), $lte: Number(pricePoolFilter.max) }
         }
 
         if (feesFilter) {

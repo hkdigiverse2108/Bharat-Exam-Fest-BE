@@ -105,12 +105,12 @@ export const get_all_contests = async (req, res) => {
             match.subTopicId = new ObjectId(subTopicFilter)
         }
 
-        if (pricePoolFilter) {
-            match.pricePool = { $gte: Number(pricePoolFilter.min), $lte: Number(pricePoolFilter.max) }
-        }
-
         if (contestTypeFilter) {
             match2["contest-type.name"] = contestTypeFilter
+        }
+
+        if (pricePoolFilter) {
+            match.pricePool = { $gte: Number(pricePoolFilter.min), $lte: Number(pricePoolFilter.max) }
         }
 
         if (feesFilter) {
