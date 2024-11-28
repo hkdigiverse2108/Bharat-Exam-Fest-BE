@@ -15,6 +15,7 @@ import swaggerUi from 'swagger-ui-express';
 import * as swaggerDocument from './swagger/swagger.json';
 import { config } from '../config';
 import multer from "multer";
+import { removeOutdatedSlots } from './helper/cron';
 
 const app = express();
 
@@ -88,4 +89,5 @@ app.use('/api-docs', function (req: any, res, next) {
 app.use(router)
 app.use('*', bad_gateway);
 
+removeOutdatedSlots.start()
 export let server = new http.Server(app);

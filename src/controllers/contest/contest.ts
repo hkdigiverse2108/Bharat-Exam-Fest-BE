@@ -1,5 +1,5 @@
-import { apiResponse, generateHourlySlots } from "../../utils";
-import { contestModel } from "../../database";
+import { apiResponse, generateHourlySlots, ROLE_TYPES } from "../../utils";
+import { contestModel, qaModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { addContestSchema, deleteContestSchema, editContestSchema, getContestSchema } from "../../validation";
 
@@ -76,7 +76,7 @@ export const delete_contest_by_id = async (req, res) => {
 export const get_all_contests = async (req, res) => {
     reqInfo(req);
     let { page, limit, search, subTopicFilter, contestFilter, pricePoolFilter, contestTypeFilter, feesFilter, sportFilter } = req.query;
-    let response: any, match: any = {}, match2: any = {};
+    let response: any, match: any = {}, match2: any = {}, { user } = req.headers;
 
     try {
         page = Number(page)
@@ -121,6 +121,11 @@ export const get_all_contests = async (req, res) => {
             match.totalSpots = { $gte: Number(sportFilter.min), $lte: Number(sportFilter.max) }
         }
 
+        if (user.userType === ROLE_TYPES.USER) {
+            let qas = await qaModel.find({ userId: new ObjectId(user?._id) })
+            let qasId = await qas.map(e => new ObjectId(e.contestId))
+            match._id = { $nin: qasId }
+        }
         response = await contestModel.aggregate([
             { $match: match },
             {

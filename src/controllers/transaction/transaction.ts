@@ -19,8 +19,9 @@ export const add_transaction = async (req, res) => {
 
         if (user.userType === ROLE_TYPES.USER) {
             value.userId = new ObjectId(user?._id)
-            if (value.walletBalance >= value.amount) {
-                value.walletBalance -= value.amount
+            if (user.walletBalance >= value.amount) {
+                user.walletBalance -= value.amount
+                await user.save()
             } else {
                 return res.status(404).json(new apiResponse(404, responseMessage?.insufficientBalance, {}, {}))
             }
