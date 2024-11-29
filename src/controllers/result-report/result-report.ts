@@ -94,34 +94,6 @@ export const get_all_result_report = async (req, res) => {
                 $unwind: { path: "$contest", preserveNullAndEmptyArrays: true }
             },
             {
-                $lookup: {
-                    from: 'subjects',
-                    let: { subjectId: "$subjectId" },
-                    pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$subjectId"] }] } } },
-                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
-                    ],
-                    as: 'subject'
-                }
-            },
-            {
-                $unwind: { path: "$subject", preserveNullAndEmptyArrays: true }
-            },
-            {
-                $lookup: {
-                    from: 'questions',
-                    let: { questionId: "$questionId" },
-                    pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$questionId"] }] } } },
-                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
-                    ],
-                    as: 'question'
-                }
-            },
-            {
-                $unwind: { path: "$question", preserveNullAndEmptyArrays: true }
-            },
-            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },

@@ -921,6 +921,15 @@
               "type": "string"
             },
             "description": "Search term to filter users"
+          },
+          {
+            "name": "blockFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Block filter to filter users"
           }
         ],
         "responses": {

@@ -98,7 +98,7 @@ export const delete_user_by_id = async (req, res) => {
 
 export const get_all_users = async (req, res) => {
     reqInfo(req);
-    let { page, limit, search } = req.query;
+    let { page, limit, search, blockFilter } = req.query;
     let response: any, match: any = {};
 
     try {
@@ -114,6 +114,14 @@ export const get_all_users = async (req, res) => {
                 { email: { $regex: search, $options: 'i' } },
                 { "contact.mobile": { $regex: search, $options: 'i' } }
             ]
+        }
+
+        if(blockFilter === true){
+            match.isBlocked = true
+        }
+
+        if(blockFilter === false){
+            match.isBlocked = false
         }
 
         response = await userModel.aggregate([
