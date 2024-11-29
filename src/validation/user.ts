@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { GENDER_TYPES, ROLE_TYPES } from "../utils";
+import { GENDER_TYPES } from "../utils";
 
 export const addUserSchema = Joi.object().keys({
     firstName: Joi.string().required(),

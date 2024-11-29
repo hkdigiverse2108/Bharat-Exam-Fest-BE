@@ -1,5 +1,4 @@
 import Joi from "joi";
-import { GENDER_TYPES, ROLE_TYPES } from "../utils";
 
 export const addHowToPlaySchema = Joi.object().keys({
     title: Joi.string().required(),

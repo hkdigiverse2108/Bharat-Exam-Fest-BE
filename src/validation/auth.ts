@@ -1,5 +1,4 @@
 import Joi from "joi";
-import { GENDER_TYPES, ROLE_TYPES } from "../utils";
 
 export const signUpSchema = Joi.object().keys({
     firstName: Joi.string().required(),

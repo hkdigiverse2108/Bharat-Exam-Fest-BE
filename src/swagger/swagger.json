@@ -3597,6 +3597,317 @@
           }
         }
       }
+    },
+    "/question-report/add": {
+      "post": {
+        "tags": ["Report FAQ"],
+        "summary": "Add a new report FAQ",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contestId": { "type": "string" },
+                  "subjectId": { "type": "string" },
+                  "questionId": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report FAQ added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/question-report/edit": {
+      "post": {
+        "tags": ["Report FAQ"],
+        "summary": "Edit an existing report FAQ",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reportFaqId": { "type": "string" },
+                  "contestId": { "type": "string" },
+                  "subjectId": { "type": "string" },
+                  "questionId": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report FAQ edited successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/question-report/delete/{id}": {
+      "delete": {
+        "tags": ["Report FAQ"],
+        "summary": "Delete a report FAQ by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report FAQ deleted successfully"
+          },
+          "404": {
+            "description": "Report FAQ not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/question-report/all": {
+      "get": {
+        "tags": ["Report FAQ"],
+        "summary": "Get all report FAQs",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of report FAQs"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/question-report/{id}": {
+      "get": {
+        "tags": ["Report FAQ"],
+        "summary": "Get a report FAQ by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report FAQ details"
+          },
+          "404": {
+            "description": "Report FAQ not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },  
+    "/result-report/add": {
+      "post": {
+        "tags": ["Result Report"],
+        "summary": "Add a new result report",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contestId": { "type": "string" },
+                  "resultId": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report FAQ added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/result-report/edit": {
+      "post": {
+        "tags": ["Result Report"],
+        "summary": "Edit an existing result report",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resultReportId": { "type": "string" },
+                  "resultId": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report FAQ edited successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/result-report/delete/{id}": {
+      "delete": {
+        "tags": ["Result Report"],
+        "summary": "Delete a result report by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report FAQ deleted successfully"
+          },
+          "404": {
+            "description": "Report FAQ not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/result-report/all": {
+      "get": {
+        "tags": ["Result Report"],
+        "summary": "Get all result reports",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of report FAQs"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/result-report/{id}": {
+      "get": {
+        "tags": ["Result Report"],
+        "summary": "Get a result report by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report FAQ details"
+          },
+          "404": {
+            "description": "Report FAQ not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   }
 }
