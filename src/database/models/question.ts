@@ -12,7 +12,7 @@ const questionSchema: any = new mongoose.Schema({
     englishQuestion: {
         question: { type: String },
         statementQuestion: [{ type: String }],
-        pairQuestion: [{ type: String }],
+        pairQuestion: { type: Array },
         lastQuestion: { type: String },
         options: {
             A: { type: String },
@@ -26,7 +26,7 @@ const questionSchema: any = new mongoose.Schema({
     hindiQuestion: {
         question: { type: String },
         statementQuestion: [{ type: String }],
-        pairQuestion: [{ type: String }],
+        pairQuestion: { type: Array },
         lastQuestion: { type: String },
         options: {
             A: { type: String },
