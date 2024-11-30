@@ -11,7 +11,7 @@ const questionSchema: any = new mongoose.Schema({
     questionType: { type: String, enum: Object.values(QUESTION_TYPE) },
     englishQuestion: {
         question: { type: String },
-        statementQuestion: [{ type: String }],
+        statementQuestion: { type: Array },
         pairQuestion: { type: Array },
         lastQuestion: { type: String },
         options: {
@@ -25,7 +25,7 @@ const questionSchema: any = new mongoose.Schema({
     },
     hindiQuestion: {
         question: { type: String },
-        statementQuestion: [{ type: String }],
+        statementQuestion: { type: Array },
         pairQuestion: { type: Array },
         lastQuestion: { type: String },
         options: {

@@ -10,7 +10,7 @@ export const addQuestionSchema = Joi.object().keys({
     questionType: Joi.string().valid(...Object.values(QUESTION_TYPE)).required(),
     englishQuestion: Joi.object().keys({
         question: Joi.string().required(),
-        statementQuestion: Joi.array().items(Joi.string()).optional(),
+        statementQuestion: Joi.array().items(Joi.object().optional()).optional(),
         pairQuestion: Joi.array().items(Joi.object().optional()).optional(),
         lastQuestion: Joi.string().optional(),
         options: Joi.object().keys({
@@ -24,7 +24,7 @@ export const addQuestionSchema = Joi.object().keys({
     }).required(),
     hindiQuestion: Joi.object().keys({
         question: Joi.string().required(),
-        statementQuestion: Joi.array().items(Joi.string()).optional(),
+        statementQuestion: Joi.array().items(Joi.object().optional()).optional(),
         pairQuestion: Joi.array().items(Joi.object().optional()).optional(),
         lastQuestion: Joi.string().optional(),
         options: Joi.object().keys({
@@ -48,7 +48,7 @@ export const editQuestionSchema = Joi.object().keys({
     questionType: Joi.string().valid(...Object.values(QUESTION_TYPE)).optional(),
     englishQuestion: Joi.object().keys({
         question: Joi.string().optional(),
-        statementQuestion: Joi.array().items(Joi.string()).optional(),
+        statementQuestion: Joi.array().items(Joi.object().optional()).optional(),
         pairQuestion: Joi.array().items(Joi.object().optional()).optional(),
         lastQuestion: Joi.string().optional(),
         options: Joi.object().keys({
@@ -62,7 +62,7 @@ export const editQuestionSchema = Joi.object().keys({
     }).required(),
     hindiQuestion: Joi.object().keys({
         question: Joi.string().optional(),
-        statementQuestion: Joi.array().items(Joi.string()).optional(),
+        statementQuestion: Joi.array().items(Joi.object().optional()).optional(),
         pairQuestion: Joi.array().items(Joi.object().optional()).optional(),
         lastQuestion: Joi.string().optional(),
         options: Joi.object().keys({
