@@ -11,7 +11,7 @@ export const addQuestionSchema = Joi.object().keys({
     englishQuestion: Joi.object().keys({
         question: Joi.string().required(),
         statementQuestion: Joi.array().items(Joi.string()).optional(),
-        pairQuestion: Joi.object().unknown(true).optional(),
+        pairQuestion: Joi.array().items(Joi.object().optional()).optional(),
         lastQuestion: Joi.string().optional(),
         options: Joi.object().keys({
             A: Joi.string().optional(),
@@ -25,7 +25,7 @@ export const addQuestionSchema = Joi.object().keys({
     hindiQuestion: Joi.object().keys({
         question: Joi.string().required(),
         statementQuestion: Joi.array().items(Joi.string()).optional(),
-        pairQuestion: Joi.object().unknown(true).optional(),
+        pairQuestion: Joi.array().items(Joi.object().optional()).optional(),
         lastQuestion: Joi.string().optional(),
         options: Joi.object().keys({
             A: Joi.string().optional(),
@@ -49,7 +49,7 @@ export const editQuestionSchema = Joi.object().keys({
     englishQuestion: Joi.object().keys({
         question: Joi.string().optional(),
         statementQuestion: Joi.array().items(Joi.string()).optional(),
-        pairQuestion: Joi.object().unknown(true).optional(),
+        pairQuestion: Joi.array().items(Joi.object().optional()).optional(),
         lastQuestion: Joi.string().optional(),
         options: Joi.object().keys({
             A: Joi.string().optional(),
@@ -63,7 +63,7 @@ export const editQuestionSchema = Joi.object().keys({
     hindiQuestion: Joi.object().keys({
         question: Joi.string().optional(),
         statementQuestion: Joi.array().items(Joi.string()).optional(),
-        pairQuestion: Joi.object().unknown(true).optional(),
+        pairQuestion: Joi.array().items(Joi.object().optional()).optional(),
         lastQuestion: Joi.string().optional(),
         options: Joi.object().keys({
             A: Joi.string().optional(),
