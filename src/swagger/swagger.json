@@ -6,7 +6,10 @@
   },
   "servers": [
     {
-      "url": "https://api-bef.hkdigiverse.com"
+      "url": "https://dev-api-bef.bharatexamfest.com"
+    },
+    {
+      "url": "https://api-bef.bharatexamfest.com"
     },
     {
       "url": "http://localhost:4000"
