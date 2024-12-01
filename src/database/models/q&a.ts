@@ -1,4 +1,4 @@
-import { ID_PROOF, KYC_STATUS, Q_A_TYPE, WHY_FALSE } from "../../utils";
+import { ID_PROOF, KYC_STATUS, Q_A_TYPE, SKIP_ELIMINATE, WHY_FALSE } from "../../utils";
 
 const mongoose = require('mongoose')
 
@@ -15,6 +15,8 @@ const qaSchema: any = new mongoose.Schema({
     totalSkippedAnswer: { type: Number, default: 0 },
     contestStartDate: { type: Date, default: null },
     contestEndDate: { type: Date, default: null },
+    contestStartTime: { type: Date, default: null },
+    contestEndTime: { type: Date, default: null },
     isPaid: { type: Boolean, default: false},
     answers: [
         {
@@ -23,6 +25,11 @@ const qaSchema: any = new mongoose.Schema({
             answer: { type: String, default: null },
             rightAnswer: { type: String, default: null },
             is2XStack: { type: Boolean, default: false },
+            eliminateOption: { type: Number, enum: Object.values(SKIP_ELIMINATE), default: null },
+            eliminateOptionA: { type: Boolean, default: false },
+            eliminateOptionB: { type: Boolean, default: false },
+            eliminateOptionC: { type: Boolean, default: false },
+            eliminateOptionD: { type: Boolean, default: false },
             whyFalse: { type: String, enum: Object.values(WHY_FALSE), default: null },
             isAnsweredTrue: { type: Boolean, default: false },
         }

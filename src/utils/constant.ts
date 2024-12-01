@@ -74,6 +74,11 @@ export const TYPE_QUESTION = {
     RANDOM: 'random'
 }
 
+export const SKIP_ELIMINATE = {
+    1: 1,
+    2: 2
+}
+
 export const QUESTION_TYPE = {
     NORMAL: 'normal',
     STATEMENT: 'statement',

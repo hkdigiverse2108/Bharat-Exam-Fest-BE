@@ -3270,6 +3270,25 @@
                           "type": "boolean",
                           "default": false
                         },
+                        "optionEliminate": {
+                          "type": "number"
+                        },
+                        "eliminateOptionA": {
+                          "type": "boolean",
+                          "default": false
+                        },
+                        "eliminateOptionB": {
+                          "type": "boolean",
+                          "default": false
+                        },
+                        "eliminateOptionC": {
+                          "type": "boolean",
+                          "default": false
+                        },
+                        "eliminateOptionD": {
+                          "type": "boolean",
+                          "default": false
+                        },
                         "answer": {
                           "type": "string"
                         },
@@ -3283,6 +3302,12 @@
                     "type": "string"
                   },
                   "contestEndDate": {
+                    "type": "string"
+                  },
+                  "contestStartTime": {
+                    "type": "string"
+                  },
+                  "contestEndTime": {
                     "type": "string"
                   }
                 }
@@ -3890,6 +3915,31 @@
           },
           "404": {
             "description": "Report FAQ not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/report/user/contest": {
+      "get": {
+        "tags": ["Report"],
+        "summary": "Get all contest user report",
+        "parameters": [
+          {
+            "name": "contestFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Contest ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of report FAQs"
           },
           "500": {
             "description": "Internal server error"

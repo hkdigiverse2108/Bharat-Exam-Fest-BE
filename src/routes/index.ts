@@ -22,6 +22,7 @@ import { qaRouter } from "./qa";
 import { transactionRouter } from "./transaction";
 import { questionReportRouter } from "./question-report";
 import { resultReportRouter } from "./result-report";
+import { reportRouter } from "./report";
 
 const router = Router()
 
@@ -48,5 +49,6 @@ router.use('/qa', qaRouter)
 router.use('/transaction', transactionRouter)
 router.use('/question-report', questionReportRouter)
 router.use('/result-report', resultReportRouter)
+router.use('/report', reportRouter)
 
 export default router
