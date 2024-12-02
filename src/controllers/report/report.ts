@@ -1,10 +1,11 @@
 // import { qaModel } from "../../database";
-// import { responseMessage } from "../../helper";
+// import { reqInfo, responseMessage } from "../../helper";
 // import { apiResponse } from "../../utils";
 
 // const ObjectId = require("mongoose").Types.ObjectId;
 
 // export const contest_user_report = async (req, res) => {
+//     reqInfo(req);
 //     let { user } = req.headers;
 //     let { contestFilter } = req.query;
 
@@ -171,11 +172,9 @@ export const contest_user_report = async (req, res) => {
     let { contestFilter } = req.query;
 
     try {
-        // Build the match query
-        let match: any = { userId: new ObjectId(user?._id) };
+        let match:any = { userId: new ObjectId(user?._id) };
         if (contestFilter) match.contestId = new ObjectId(contestFilter);
 
-        // Aggregate data from the database
         let qa = await qaModel.aggregate([
             { $match: match },
             {
@@ -204,89 +203,118 @@ export const contest_user_report = async (req, res) => {
                         ] // Time in seconds
                     },
                     qaTypeMetrics: {
-                        $reduce: {
-                            input: "$answers",
-                            initialValue: {
-                                sure: { direct: { correct: 0, total: 0 }, fiftyFifty: { correct: 0, total: 0 }, oneEliminate: { correct: 0, total: 0 } },
-                                logicPlay: { direct: { correct: 0, total: 0 }, fiftyFifty: { correct: 0, total: 0 }, oneEliminate: { correct: 0, total: 0 } },
-                                intuitionHit: { direct: { correct: 0, total: 0 }, fiftyFifty: { correct: 0, total: 0 }, oneEliminate: { correct: 0, total: 0 } },
-                                blindFire: { direct: { correct: 0, total: 0 }, fiftyFifty: { correct: 0, total: 0 }, oneEliminate: { correct: 0, total: 0 } },
-                                skip: { direct: { correct: 0, total: 0 }, fiftyFifty: { correct: 0, total: 0 }, oneEliminate: { correct: 0, total: 0 } },
-                                fearDriverSkip: { direct: { correct: 0, total: 0 }, fiftyFifty: { correct: 0, total: 0 }, oneEliminate: { correct: 0, total: 0 } }
-                            },
-                            in: {
-                                sure: {
-                                    direct: {
-                                        correct: {
-                                            $add: ["$$value.sure.direct.correct", {
-                                                $cond: [{ $and: [
-                                                    { $eq: ["$$this.type", "100%Sure"] },
-                                                    { $eq: ["$$this.isAnsweredTrue", true] }
-                                                ] }, 1, 0]
-                                            }]
+                        $arrayToObject: {
+                            $map: {
+                                input: ["100%Sure", "logicPlay", "intuitionHit", "blindFire", "skip", "fearDriverSkip"],
+                                as: "type",
+                                in: {
+                                    k: "$$type",
+                                    v: {
+                                        direct: {
+                                            correct: {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $and: [
+                                                                { $eq: ["$$answer.type", "$$type"] },
+                                                                { $eq: ["$$answer.isAnsweredTrue", true] },
+                                                                { $eq: ["$$answer.eliminateOption", null] }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            total: {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: { $eq: ["$$answer.type", "$$type"] }
+                                                    }
+                                                }
+                                            }
                                         },
-                                        total: {
-                                            $add: ["$$value.sure.direct.total", { $cond: [{ $and: [
-                                                { $eq: ["$$this.type", "100%Sure"] }
-                                            ] }, 1, 0] }]
-                                        }
-                                    },
-                                    fiftyFifty: {
-                                        correct: {
-                                            $add: ["$$value.sure.fiftyFifty.correct", {
-                                                $cond: [{ $and: [
-                                                    { $eq: ["$$this.type", "100%Sure"] },
-                                                    { $eq: ["$$this.isAnsweredTrue", true] },
-                                                    { $eq: ["$$this.eliminateOption", 2] }
-                                                ] }, 1, 0]
-                                            }]
+                                        fiftyFifty: {
+                                            correct: {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $and: [
+                                                                { $eq: ["$$answer.type", "$$type"] },
+                                                                { $eq: ["$$answer.isAnsweredTrue", true] },
+                                                                { $eq: ["$$answer.eliminateOption", 2] }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            total: {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $and: [
+                                                                { $eq: ["$$answer.type", "$$type"] },
+                                                                { $eq: ["$$answer.eliminateOption", 2] }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         },
-                                        total: {
-                                            $add: ["$$value.sure.fiftyFifty.total", { $cond: [{ $and: [
-                                                { $eq: ["$$this.type", "100%Sure"] },
-                                                { $eq: ["$$this.eliminateOption", 2] }
-                                            ] }, 1, 0] }]
-                                        }
-                                    },
-                                    oneEliminate: {
-                                        correct: {
-                                            $add: ["$$value.sure.oneEliminate.correct", {
-                                                $cond: [{ $and: [
-                                                    { $eq: ["$$this.type", "100%Sure"] },
-                                                    { $eq: ["$$this.isAnsweredTrue", true] },
-                                                    { $eq: ["$$this.eliminateOption", 1] }
-                                                ] }, 1, 0]
-                                            }]
-                                        },
-                                        total: {
-                                            $add: ["$$value.sure.oneEliminate.total", { $cond: [{ $and: [
-                                                { $eq: ["$$this.type", "100%Sure"] },
-                                                { $eq: ["$$this.eliminateOption", 1] }
-                                            ] }, 1, 0] }]
+                                        oneEliminate: {
+                                            correct: {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $and: [
+                                                                { $eq: ["$$answer.type", "$$type"] },
+                                                                { $eq: ["$$answer.isAnsweredTrue", true] },
+                                                                { $eq: ["$$answer.eliminateOption", 1] }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            total: {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $and: [
+                                                                { $eq: ["$$answer.type", "$$type"] },
+                                                                { $eq: ["$$answer.eliminateOption", 1] }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
-                                },
-                                logicPlay: "$$value.logicPlay",
-                                intuitionHit: "$$value.intuitionHit",
-                                blindFire: "$$value.blindFire",
-                                skip: "$$value.skip",
-                                fearDriverSkip: "$$value.fearDriverSkip"
+                                }
                             }
                         }
                     }
                 }
             }
         ]);
+        
 
         // Fallback for empty result
         if (!qa.length) {
             return res.status(404).json(new apiResponse(404, "No data found", {}, {}));
         }
 
-        // Mock rank calculation for demo purposes (adjust logic as needed)
-        let rank = 1000; // Example static rank, replace with your logic
+        let rank = 1000;
 
-        // Respond with calculated metrics
         return res.status(200).json(
             new apiResponse(200, responseMessage?.getDataSuccess("qa"), {
                 totalPoints: qa[0]?.totalPoints || 0,
@@ -294,7 +322,7 @@ export const contest_user_report = async (req, res) => {
                 incorrect: qa[0]?.incorrect || 0,
                 unanswered: qa[0]?.unanswered || 0,
                 rank: rank,
-                time: qa[0]?.timeTaken || 0, // Time in seconds
+                time: qa[0]?.timeTaken || 0,
                 qaTypeMetrics: qa[0]?.qaTypeMetrics || {}
             }, {})
         );
@@ -303,3 +331,4 @@ export const contest_user_report = async (req, res) => {
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 };
+
