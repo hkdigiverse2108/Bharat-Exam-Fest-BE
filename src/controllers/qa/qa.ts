@@ -85,10 +85,10 @@ export const edit_qa_by_id = async (req, res) => {
             body.totalSkippedAnswer = totalSkippedAnswer;
         }
 
-        const response = await qaModel.findOneAndUpdate({ _id: ObjectId(body.qaId) }, body, { new: true }).save();
-        if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}))
+        const response = await qaModel.findOneAndUpdate({ _id: new ObjectId(body.qaId) }, body, { new: true })
+        if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.updateDataError("qa"), {}, {}))
 
-        return res.status(200).json(new apiResponse(200, responseMessage?.addDataSuccess("question"), response, {}))
+        return res.status(200).json(new apiResponse(200, responseMessage?.updateDataSuccess("qa"), response, {}))
     } catch (error) {
         console.log("error", error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
