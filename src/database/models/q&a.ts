@@ -25,7 +25,7 @@ const qaSchema: any = new mongoose.Schema({
             answer: { type: String, default: null },
             rightAnswer: { type: String, default: null },
             is2XStack: { type: Boolean, default: false },
-            eliminateOption: { type: Number, enum: Object.values(SKIP_ELIMINATE), default: null },
+            eliminateOption: { type: Number, default: null },
             eliminateOptionA: { type: Boolean, default: false },
             eliminateOptionB: { type: Boolean, default: false },
             eliminateOptionC: { type: Boolean, default: false },
