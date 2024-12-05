@@ -80,20 +80,6 @@ export const get_all_result_report = async (req, res) => {
         const response = await resultReportModel.aggregate([
             { $match: match },
             {
-                $lookup: {
-                    from: 'contests',
-                    let: { contestId: "$contestId" },
-                    pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestId"] }] } } },
-                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
-                    ],
-                    as: 'contest'
-                }
-            },
-            {
-                $unwind: { path: "$contest", preserveNullAndEmptyArrays: true }
-            },
-            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },
