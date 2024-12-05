@@ -15,7 +15,7 @@ import swaggerUi from 'swagger-ui-express';
 import * as swaggerDocument from './swagger/swagger.json';
 import { config } from '../config';
 import multer from "multer";
-import { removeOutdatedSlots } from './helper/cron';
+import { assignContestRanksUser, removeOutdatedSlots } from './helper/cron';
 
 const app = express();
 
@@ -90,4 +90,5 @@ app.use(router)
 app.use('*', bad_gateway);
 
 removeOutdatedSlots.start()
+assignContestRanksUser.start()
 export let server = new http.Server(app);

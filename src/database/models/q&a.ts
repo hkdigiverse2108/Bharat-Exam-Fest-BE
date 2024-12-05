@@ -18,6 +18,8 @@ const qaSchema: any = new mongoose.Schema({
     contestStartTime: { type: Date, default: null },
     contestEndTime: { type: Date, default: null },
     isPaid: { type: Boolean, default: false},
+    rank: { type: Number, default: null },
+    contestRankId: { type: mongoose.Schema.Types.ObjectId, ref: 'contest-rank', default: null },
     answers: [
         {
             questionId: { type: mongoose.Schema.Types.ObjectId, ref: 'question', default: null },

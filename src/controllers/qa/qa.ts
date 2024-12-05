@@ -1,4 +1,4 @@
-import { contestModel, qaModel, questionModel } from "../../database"
+import { contestModel, contestRankModel, qaModel, questionModel } from "../../database"
 import { reqInfo, responseMessage } from "../../helper"
 import { apiResponse, ROLE_TYPES } from "../../utils"
 
@@ -197,6 +197,19 @@ export const get_all_qa = async (req, res) => {
             },
             {
                 $lookup: {
+                    from: 'contest-ranks',
+                    let: { contestRankId: "$contestRankId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestRankId"] }] } } }
+                    ],
+                    as: 'contestRank'
+                }
+            },
+            {
+                $unwind: { path: "$contestRank", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
                     from: 'subjects',
                     let: { subjectId: "$subjectId" },
                     pipeline: [
@@ -261,5 +274,138 @@ export const get_user_contest_question_by_id = async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
+    }
+}
+
+export const assignContestRanks = async () => {
+    try {
+        const now = new Date();
+        const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+        console.log("oneHourAgo", oneHourAgo);
+        console.log("now => ", now);
+        const results = await qaModel.find({
+            contestEndDate: { $gte: now },
+            contestStartDate: { $gte: oneHourAgo },
+            contestRankId: null,
+            isDeleted: false
+        });
+
+        for (const result of results) {
+            let isExistContestRank = await contestRankModel.findOne({
+                contestId: new ObjectId(result.contestId),
+                contestStartDate: result.contestStartDate,
+                contestEndDate: result.contestEndDate
+            }).lean();
+            if (isExistContestRank) continue;
+
+            const contest = await contestModel.findOne({
+                _id: new ObjectId(result.contestId),
+                isDeleted: false
+            }).lean();
+            if (!contest) continue;
+
+            const { ranks } = contest; // Fetch dynamic ranks configuration
+
+            const participants = await qaModel.aggregate([
+                { $match: { contestId: new ObjectId(result.contestId), isDeleted: false } },
+                {
+                    $lookup: {
+                        from: 'users',
+                        let: { userId: "$userId" },
+                        pipeline: [
+                            { $match: { $expr: { $and: [{ $eq: ["$_id", "$$userId"] }] } } },
+                            { $project: { firstName: 1, lastName: 1 } },
+                        ],
+                        as: 'user'
+                    }
+                },
+                { $unwind: '$user' },
+                {
+                    $project: {
+                        userId: 1,
+                        qaId: 1,
+                        totalPoints: 1,
+                        firstName: '$user.firstName',
+                        lastName: '$user.lastName'
+                    }
+                },
+                { $sort: { totalPoints: -1 } }
+            ]);
+
+            let currentRank = 1;
+            let assignedRanks = ranks.map(rankDef => ({ ...rankDef, winners: [] }));
+            const qaIds = new Set(); // Collect all qaIds involved
+
+            for (let i = 0; i < participants.length; ) {
+                const samePointsGroup = [];
+                const currentPoints = participants[i].totalPoints;
+
+                // Group participants with the same points
+                while (i < participants.length && participants[i].totalPoints === currentPoints) {
+                    samePointsGroup.push(participants[i]);
+                    qaIds.add(participants[i].qaId); // Add qaId to the set
+                    i++;
+                }
+
+                // Shuffle the samePointsGroup to randomize their rank assignment
+                samePointsGroup.sort(() => Math.random() - 0.5);
+
+                // Assign the group to ranks
+                for (const participant of samePointsGroup) {
+                    for (const rankDef of assignedRanks) {
+                        const start = parseInt(rankDef.startPlace) || currentRank; // Handle dynamic ranks
+                        const end = rankDef.endPlace ? parseInt(rankDef.endPlace) : start;
+                        if (currentRank >= start && currentRank <= end) {
+                            rankDef.winners.push({
+                                userId: participant.userId,
+                                qaId: participant.qaId,
+                                rank: currentRank,
+                                points: participant.totalPoints,
+                                firstName: participant.firstName,
+                                lastName: participant.lastName
+                            });
+                            await qaModel.findOneAndUpdate(
+                                { userId: participant.userId, contestId: new ObjectId(result.contestId) },
+                                { rank: currentRank },
+                                { new: true }
+                            );
+                            break;
+                        }
+                    }
+                    currentRank++;
+                }
+            }
+            let response = {
+                contestId: new ObjectId(result.contestId),
+                qaIds: Array.from(qaIds), // Convert the set to an array
+                ranks: assignedRanks,
+                contestStartDate: result.contestStartDate,
+                contestEndDate: result.contestEndDate
+            };
+
+            let contestRank = await new contestRankModel(response).save();
+            console.log("result => ", result._id);
+            await qaModel.findOneAndUpdate(
+                { _id: new ObjectId(result._id) },
+                { contestRankId: new ObjectId(contestRank._id) },
+                { new: true }
+            );
+        }
+    } catch (error) {
+        console.error('Error assigning contest ranks:', error);
+    }
+};
+
+
+export const get_all_contest_ranks = async (req, res) => {
+    reqInfo(req)
+    let { contestFilter } = req.query
+    try {
+        let ranks = await contestRankModel.find({ contestId: new ObjectId(contestFilter), isDeleted: false }).lean()
+        if(!ranks) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest ranks"), {}, {}))
+
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("contest ranks"), ranks, {}))
+    } catch (error) {
+        console.log("error =>", error)
     }
 }

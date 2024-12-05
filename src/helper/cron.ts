@@ -1,3 +1,4 @@
+import { assignContestRanks } from "../controllers/qa/qa";
 import { contestModel } from "../database";
 import { CronJob } from 'cron'
 
@@ -15,6 +16,15 @@ export const removeOutdatedSlots = new CronJob('*/20 * * * * *', async function 
             await contest.save();
         }
 
+    } catch (error) {
+        console.error('Error removing outdated slots:', error);
+    }
+}, null, false, 'Asia/Kolkata')
+
+
+export const assignContestRanksUser = new CronJob('*/10 * * * * *', async function () {
+    try {
+        await assignContestRanks();
     } catch (error) {
         console.error('Error removing outdated slots:', error);
     }
