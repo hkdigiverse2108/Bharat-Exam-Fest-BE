@@ -7,7 +7,6 @@ const qaSchema: any = new mongoose.Schema({
     classesId: { type: mongoose.Schema.Types.ObjectId, ref: 'classes', default: null },
     contestId: { type: mongoose.Schema.Types.ObjectId, ref: 'contest' },
     subjectId: { type: mongoose.Schema.Types.ObjectId, ref: 'subject' },
-    subTopicId: { type: mongoose.Schema.Types.ObjectId, ref: "sub-topic", default: null },
     stackNumber: { type: Number, default: 0 },
     totalPoints: { type: Number, default: 0 },
     totalRightAnswer: { type: Number, default: 0 },

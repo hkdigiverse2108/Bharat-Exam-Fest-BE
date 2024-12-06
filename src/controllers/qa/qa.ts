@@ -141,20 +141,6 @@ export const get_all_qa = async (req, res) => {
             { $match: match },
             {
                 $lookup: {
-                    from: 'sub-topics',
-                    let: { subTopicId: "$subTopicId" },
-                    pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$subTopicId"] }] } } },
-                        { $project: { _id: 1, name: 1 } }
-                    ],
-                    as: 'subTopic'
-                }
-            },
-            {
-                $unwind: { path: "$subTopic", preserveNullAndEmptyArrays: true }
-            },
-            {
-                $lookup: {
                     from: 'contests',
                     let: { contestId: "$contestId" },
                     pipeline: [
@@ -264,12 +250,40 @@ export const get_user_contest_question_by_id = async (req, res) => {
         let contest = await contestModel.findOne({ _id: new ObjectId(qa.contestId), isDeleted: false }).lean()
         if (!contest) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest"), {}, {}))
 
-        let questions = await questionModel.aggregate([
-            { $match: { subtopicIds: { $in: [new ObjectId(qa?.subTopicId)] }, subjectId: new ObjectId(qa?.subjectId), isDeleted: false } },
-            { $sample: { size: contest.totalQuestions } }
+        let totalQuestions = contest.totalQuestions;
+        if(totalQuestions === 0) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("questions"), {}, {}))
+        // Step 1: Find subtopics for the subject
+        let subtopics = await questionModel.aggregate([
+            { $match: { subjectId: new ObjectId(qa?.subjectId), isDeleted: false } },
+            { $unwind: "$subtopicIds" },
+            { $group: { _id: "$subtopicIds" } }
         ]);
-
-        qa.answers = questions
+        
+        // Step 2: Calculate questions per subtopic and remaining questions
+        let numSubtopics = subtopics.length;
+        let questionsPerSubtopic = Math.floor(totalQuestions / numSubtopics);
+        let remainingQuestions = totalQuestions % numSubtopics;
+        
+        // Step 3: Fetch questions for each subtopic
+        let questions = [];
+        
+        for (let i = 0; i < subtopics.length; i++) {
+            let subtopicId = subtopics[i]._id;
+        
+            // Determine number of questions to fetch for this subtopic
+            let limit = questionsPerSubtopic + (remainingQuestions > 0 ? 1 : 0);
+            remainingQuestions--;
+        
+            // Fetch questions for this subtopic
+            let subtopicQuestions = await questionModel.aggregate([
+                { $match: { subtopicIds: subtopicId, subjectId: new ObjectId(qa?.subjectId), isDeleted: false } },
+                { $sample: { size: limit } }
+            ]);
+        
+            questions.push(...subtopicQuestions);
+        }
+        
+        qa.answers = questions;
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), qa, {}))
     } catch (error) {
         console.log(error);
@@ -281,8 +295,6 @@ export const assignContestRanks = async () => {
     try {
         const now = new Date();
         const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-        console.log("oneHourAgo", oneHourAgo);
-        console.log("now => ", now);
         const results = await qaModel.find({
             contestEndDate: { $gte: now },
             contestStartDate: { $gte: oneHourAgo },
@@ -291,11 +303,7 @@ export const assignContestRanks = async () => {
         });
 
         for (const result of results) {
-            let isExistContestRank = await contestRankModel.findOne({
-                contestId: new ObjectId(result.contestId),
-                contestStartDate: result.contestStartDate,
-                contestEndDate: result.contestEndDate
-            }).lean();
+            let isExistContestRank = await contestRankModel.findOne({ contestId: new ObjectId(result.contestId), contestStartDate: result.contestStartDate, contestEndDate: result.contestEndDate }).lean();
             if (isExistContestRank) continue;
 
             const contest = await contestModel.findOne({
@@ -305,7 +313,7 @@ export const assignContestRanks = async () => {
             if (!contest) continue;
 
             const { ranks } = contest; // Fetch dynamic ranks configuration
-
+            let qaIds = await qaModel.find({ contestId: new ObjectId(result.contestId), contestStartDate: result.contestStartDate, contestEndDate: result.contestEndDate, isDeleted: false }).select("_id").lean()
             const participants = await qaModel.aggregate([
                 { $match: { contestId: new ObjectId(result.contestId), isDeleted: false } },
                 {
@@ -325,6 +333,7 @@ export const assignContestRanks = async () => {
                         userId: 1,
                         qaId: 1,
                         totalPoints: 1,
+                        profileImage: '$user.profileImage',
                         firstName: '$user.firstName',
                         lastName: '$user.lastName'
                     }
@@ -334,7 +343,6 @@ export const assignContestRanks = async () => {
 
             let currentRank = 1;
             let assignedRanks = ranks.map(rankDef => ({ ...rankDef, winners: [] }));
-            const qaIds = new Set(); // Collect all qaIds involved
 
             for (let i = 0; i < participants.length; ) {
                 const samePointsGroup = [];
@@ -343,7 +351,7 @@ export const assignContestRanks = async () => {
                 // Group participants with the same points
                 while (i < participants.length && participants[i].totalPoints === currentPoints) {
                     samePointsGroup.push(participants[i]);
-                    qaIds.add(participants[i].qaId); // Add qaId to the set
+                    // qaIds.add(participants[i].qaId); // Add qaId to the set
                     i++;
                 }
 
@@ -361,6 +369,7 @@ export const assignContestRanks = async () => {
                                 qaId: participant.qaId,
                                 rank: currentRank,
                                 points: participant.totalPoints,
+                                profileImage: participant.profileImage,
                                 firstName: participant.firstName,
                                 lastName: participant.lastName
                             });
@@ -377,7 +386,7 @@ export const assignContestRanks = async () => {
             }
             let response = {
                 contestId: new ObjectId(result.contestId),
-                qaIds: Array.from(qaIds), // Convert the set to an array
+                qaIds: qaIds, // Convert the set to an array
                 ranks: assignedRanks,
                 contestStartDate: result.contestStartDate,
                 contestEndDate: result.contestEndDate
@@ -399,13 +408,15 @@ export const assignContestRanks = async () => {
 
 export const get_all_contest_ranks = async (req, res) => {
     reqInfo(req)
-    let { contestFilter } = req.query
+    let { contestFilter, qaFilter } = req.query, { user } = req.headers, match: any = {}
     try {
-        let ranks = await contestRankModel.find({ contestId: new ObjectId(contestFilter), isDeleted: false }).lean()
-        if(!ranks) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest ranks"), {}, {}))
+
+        let ranks = await contestRankModel.find({ contestId: new ObjectId(contestFilter), qaIds: { $in: [new ObjectId(qaFilter)] } }).populate("contestId").lean()
+        if (!ranks) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest ranks"), {}, {}))
 
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("contest ranks"), ranks, {}))
     } catch (error) {
         console.log("error =>", error)
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
