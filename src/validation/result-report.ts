@@ -1,13 +1,17 @@
 import Joi from "joi";
 
 export const addResultReportSchema = Joi.object().keys({
-    userId: Joi.string().required(),
+    qaId: Joi.string().optional(),
+    contestId: Joi.string().optional(),
+    questionId: Joi.string().optional(),
     message: Joi.string().optional()
 });
 
 export const editResultReportSchema = Joi.object().keys({
     resultReportId: Joi.string().required(),
-    userId: Joi.string().optional(),
+    contestId: Joi.string().optional(),
+    qaId: Joi.string().optional(),
+    questionId: Joi.string().optional(),
     message: Joi.string().optional()
 });
 

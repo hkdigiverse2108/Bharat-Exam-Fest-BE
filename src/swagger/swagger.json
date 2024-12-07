@@ -12,7 +12,7 @@
       "url": "https://api-bef.bharatexamfest.com"
     },
     {
-      "url": "http://localhost:4000"
+      "url": "http://localhost:5000"
     },
     {
       "url": "http://62.72.58.17"
@@ -102,28 +102,7 @@
         },
         "responses": {
           "200": {
-            "description": "Admin Created Successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "firstName": {
-                      "type": "string"
-                    },
-                    "lastName": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string"
-                    },
-                    "password": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Admin Created Successfully."
           },
           "400": {
             "description": "Invalid input"
@@ -3191,6 +3170,46 @@
         }
       }
     },
+    "/upload/pdf": {
+      "post": {
+        "tags": ["Upload"],
+        "summary": "Upload a PDF file",
+        "description": "Uploads a PDF file and stores or updates its associated URL in the database.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "The type associated with the PDF file"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The PDF file to upload"
+                  }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF uploaded successfully"
+          },
+          "400": {
+            "description": "Bad request (e.g., missing or invalid file type, missing type field for PDF uploads)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },    
     "/qa/add": {
       "post": {
         "tags": ["QA"],
@@ -3817,7 +3836,8 @@
                 "type": "object",
                 "properties": {
                   "contestId": { "type": "string" },
-                  "resultId": { "type": "string" },
+                  "qaId": { "type": "string" },
+                  "questionId": { "type": "string" },
                   "message": { "type": "string" }
                 }
               }
@@ -3849,7 +3869,9 @@
                 "type": "object",
                 "properties": {
                   "resultReportId": { "type": "string" },
-                  "resultId": { "type": "string" },
+                  "contestId": { "type": "string" },
+                  "qaId": { "type": "string" },
+                  "questionId": { "type": "string" },
                   "message": { "type": "string" }
                 }
               }

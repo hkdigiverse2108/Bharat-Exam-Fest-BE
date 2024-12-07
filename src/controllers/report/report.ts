@@ -6,11 +6,12 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 export const contest_user_report = async (req, res) => {
     let { user } = req.headers;
-    let { contestFilter } = req.query;
+    let { contestFilter, qaFilter } = req.query;
 
     try {
         let match:any = { userId: new ObjectId(user?._id) };
         if (contestFilter) match.contestId = new ObjectId(contestFilter);
+        if (qaFilter) match._id = new ObjectId(qaFilter);
 
         let qa = await qaModel.aggregate([
             { $match: match },

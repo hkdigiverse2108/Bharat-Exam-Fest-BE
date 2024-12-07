@@ -80,6 +80,62 @@ export const get_all_result_report = async (req, res) => {
         const response = await resultReportModel.aggregate([
             { $match: match },
             {
+                $lookup: {
+                    from: 'qas',
+                    let: { qaId: "$qaId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$qaId"] }] } } },
+                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
+                    ],
+                    as: 'qa'
+                }
+            },
+            {
+                $unwind: { path: "$qa", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'contests',
+                    let: { contestId: "$contestId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestId"] }] } } },
+                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
+                    ],
+                    as: 'contest'
+                }
+            },
+            {
+                $unwind: { path: "$contest", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'questions',
+                    let: { questionId: "$questionId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$questionId"] }] } } },
+                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
+                    ],
+                    as: 'question'
+                }
+            },
+            {
+                $unwind: { path: "$question", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    let: { userId: "$userId" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$userId"] }] } } },
+                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
+                    ],
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: { path: "$user", preserveNullAndEmptyArrays: true }
+            },
+            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },

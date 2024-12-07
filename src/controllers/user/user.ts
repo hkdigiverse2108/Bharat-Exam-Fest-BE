@@ -115,15 +115,13 @@ export const get_all_users = async (req, res) => {
                 { "contact.mobile": { $regex: search, $options: 'i' } }
             ]
         }
-
-        if(blockFilter === true){
-            match.isBlocked = true
+        if(blockFilter){
+            if(blockFilter === "true"){
+                match.isBlocked = true
+            }else{
+                match.isBlocked = false
+            }
         }
-
-        if(blockFilter === false){
-            match.isBlocked = false
-        }
-
         response = await userModel.aggregate([
             { $match: match }, 
             {
