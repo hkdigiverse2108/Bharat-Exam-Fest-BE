@@ -97,15 +97,17 @@ export const edit_qa_by_id = async (req, res) => {
 
 export const get_all_qa = async (req, res) => {
     reqInfo(req);
-    let { page, limit, search, contestFilter, pricePoolFilter, contestTypeFilter, feesFilter, sportFilter } = req.query;
+    let { page, limit, search, contestFilter, pricePoolFilter, contestTypeFilter, feesFilter, sportFilter, qaFilter } = req.query;
     let response: any, match: any = {}, match2: any = {}, { user } = req.headers;
     try {
-        page = Number(page)
-        limit = Number(limit)
+        page = Number(page);
+        limit = Number(limit);
 
         if (user.userType === ROLE_TYPES.USER) {
-            match.userId = new ObjectId(user._id)
+            match.userId = new ObjectId(user._id);
         }
+
+        if (qaFilter) match._id = new ObjectId(qaFilter);
 
         if (contestFilter) {
             if (contestFilter === "upcoming") {
@@ -115,26 +117,26 @@ export const get_all_qa = async (req, res) => {
                 match2["contest.startDate"] = { $lte: new Date() };
                 match2["contest.endDate"] = { $gte: new Date() };
             } else if (contestFilter === "completed") {
-                match2["contest.endDate"] = { $lt: new Date() }
+                match2["contest.endDate"] = { $lt: new Date() };
             } else {
-                return res.status(404).json(new apiResponse(404, "Invalid status", {}, {}))
+                return res.status(404).json(new apiResponse(404, "Invalid status", {}, {}));
             }
         }
 
         if (contestTypeFilter) {
-            match2["contest.contest-type.name"] = contestTypeFilter
+            match2["contest.contest-type.name"] = contestTypeFilter;
         }
 
         if (pricePoolFilter) {
-            match2["contest.pricePool"] = { $gte: Number(pricePoolFilter.min), $lte: Number(pricePoolFilter.max) }
+            match2["contest.pricePool"] = { $gte: Number(pricePoolFilter.min), $lte: Number(pricePoolFilter.max) };
         }
 
         if (feesFilter) {
-            match2["contest.fees"] = { $gte: Number(feesFilter.min), $lte: Number(feesFilter.max) }
+            match2["contest.fees"] = { $gte: Number(feesFilter.min), $lte: Number(feesFilter.max) };
         }
 
         if (sportFilter) {
-            match2["contest.totalSpots"] = { $gte: Number(sportFilter.min), $lte: Number(sportFilter.max) }
+            match2["contest.totalSpots"] = { $gte: Number(sportFilter.min), $lte: Number(sportFilter.max) };
         }
 
         response = await qaModel.aggregate([
@@ -144,69 +146,81 @@ export const get_all_qa = async (req, res) => {
                     from: 'contests',
                     let: { contestId: "$contestId" },
                     pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestId"] }] } } },
+                        { $match: { $expr: { $eq: ["$_id", "$$contestId"] } } },
                         { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
                         {
                             $lookup: {
                                 from: 'contest-types',
                                 let: { contestTypeId: "$contestTypeId" },
                                 pipeline: [
-                                    { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestTypeId"] }] } } },
+                                    { $match: { $expr: { $eq: ["$_id", "$$contestTypeId"] } } },
                                     { $project: { _id: 1, name: 1 } }
                                 ],
                                 as: 'contest-type'
                             }
                         },
-                        {
-                            $unwind: { path: "$contest-type", preserveNullAndEmptyArrays: true }
-                        },
+                        { $unwind: { path: "$contest-type", preserveNullAndEmptyArrays: true } }
                     ],
                     as: 'contest'
                 }
             },
-            {
-                $unwind: { path: "$contest", preserveNullAndEmptyArrays: true }
-            },
+            { $unwind: { path: "$contest", preserveNullAndEmptyArrays: true } },
             {
                 $lookup: {
                     from: 'classes',
                     let: { classesId: "$classesId" },
                     pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$classesId"] }] } } },
-                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
+                        { $match: { $expr: { $eq: ["$_id", "$$classesId"] } } },
+                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } }
                     ],
                     as: 'classes'
                 }
             },
-            {
-                $unwind: { path: "$classes", preserveNullAndEmptyArrays: true }
-            },
+            { $unwind: { path: "$classes", preserveNullAndEmptyArrays: true } },
             {
                 $lookup: {
                     from: 'contest-ranks',
                     let: { contestRankId: "$contestRankId" },
                     pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$contestRankId"] }] } } }
+                        { $match: { $expr: { $eq: ["$_id", "$$contestRankId"] } } }
                     ],
                     as: 'contestRank'
                 }
             },
-            {
-                $unwind: { path: "$contestRank", preserveNullAndEmptyArrays: true }
-            },
+            { $unwind: { path: "$contestRank", preserveNullAndEmptyArrays: true } },
             {
                 $lookup: {
                     from: 'subjects',
                     let: { subjectId: "$subjectId" },
                     pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ["$_id", "$$subjectId"] }] } } },
-                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } },
+                        { $match: { $expr: { $eq: ["$_id", "$$subjectId"] } } },
+                        { $project: { createdBy: 0, updatedBy: 0, createdAt: 0, updatedAt: 0, isBlocked: 0, isDeleted: 0 } }
                     ],
                     as: 'subject'
                 }
             },
+            { $unwind: { path: "$subject", preserveNullAndEmptyArrays: true } },
             {
-                $unwind: { path: "$subject", preserveNullAndEmptyArrays: true }
+                $lookup: {
+                    from: 'questions',
+                    let: { answers: "$answers" },
+                    pipeline: [
+                        { $match: { $expr: { $in: ["$_id", { $map: { input: "$$answers", as: "answer", in: "$$answer.questionId" } }] } } },
+                        {
+                            $lookup: {
+                                from: 'sub-topics',
+                                let: { subtopicIds: "$subtopicIds" },
+                                pipeline: [
+                                    { $match: { $expr: { $in: ["$_id", "$$subtopicIds"] } } },
+                                    { $project: { name: 1 } }
+                                ],
+                                as: 'subtopics'
+                            }
+                        },
+                        { $project: { subtopics: 1 } }
+                    ],
+                    as: 'questions'
+                }
             },
             {
                 $addFields: { userRank: 0 }
@@ -222,7 +236,7 @@ export const get_all_qa = async (req, res) => {
                     data_count: [{ $count: "count" }]
                 }
             }
-        ])
+        ]);
 
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), {
             contest_type_data: response[0]?.data || [],
@@ -232,10 +246,10 @@ export const get_all_qa = async (req, res) => {
                 limit: limit,
                 page_limit: Math.ceil(response[0]?.data_count[0]?.count / limit) || 1,
             },
-        }, {}))
+        }, {}));
     } catch (error) {
-        console.log("error=> ", error)
-        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+        console.log("error=> ", error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 }
 
@@ -251,38 +265,38 @@ export const get_user_contest_question_by_id = async (req, res) => {
         if (!contest) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest"), {}, {}))
 
         let totalQuestions = contest.totalQuestions;
-        if(totalQuestions === 0) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("questions"), {}, {}))
+        if (totalQuestions === 0) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("questions"), {}, {}))
         // Step 1: Find subtopics for the subject
         let subtopics = await questionModel.aggregate([
             { $match: { subjectId: new ObjectId(qa?.subjectId), isDeleted: false } },
             { $unwind: "$subtopicIds" },
             { $group: { _id: "$subtopicIds" } }
         ]);
-        
+
         // Step 2: Calculate questions per subtopic and remaining questions
         let numSubtopics = subtopics.length;
         let questionsPerSubtopic = Math.floor(totalQuestions / numSubtopics);
         let remainingQuestions = totalQuestions % numSubtopics;
-        
+
         // Step 3: Fetch questions for each subtopic
         let questions = [];
-        
+
         for (let i = 0; i < subtopics.length; i++) {
             let subtopicId = subtopics[i]._id;
-        
+
             // Determine number of questions to fetch for this subtopic
             let limit = questionsPerSubtopic + (remainingQuestions > 0 ? 1 : 0);
             remainingQuestions--;
-        
+
             // Fetch questions for this subtopic
             let subtopicQuestions = await questionModel.aggregate([
                 { $match: { subtopicIds: subtopicId, subjectId: new ObjectId(qa?.subjectId), isDeleted: false } },
                 { $sample: { size: limit } }
             ]);
-        
+
             questions.push(...subtopicQuestions);
         }
-        
+
         qa.answers = questions;
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), qa, {}))
     } catch (error) {
@@ -344,7 +358,7 @@ export const assignContestRanks = async () => {
             let currentRank = 1;
             let assignedRanks = ranks.map(rankDef => ({ ...rankDef, winners: [] }));
 
-            for (let i = 0; i < participants.length; ) {
+            for (let i = 0; i < participants.length;) {
                 const samePointsGroup = [];
                 const currentPoints = participants[i].totalPoints;
 

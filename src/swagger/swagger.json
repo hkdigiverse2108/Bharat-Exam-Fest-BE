@@ -3391,6 +3391,15 @@
             "description": "Contest type filter"
           },
           {
+            "name": "qaFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "QA _id filter"
+          },
+          {
             "name": "pricePoolFilter[min]",
             "in": "query",
             "required": false,
@@ -3981,11 +3990,20 @@
         }
       }
     },
-    "/report/user/contest": {
+    "/report": {
       "get": {
         "tags": ["Report"],
         "summary": "Get all contest user report",
         "parameters": [
+          {
+            "name": "qaFilter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "QA ID"
+          },
           {
             "name": "contestFilter",
             "in": "query",
