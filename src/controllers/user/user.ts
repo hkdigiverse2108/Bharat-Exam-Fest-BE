@@ -1,5 +1,5 @@
-import { apiResponse, generateHash, generateUserId, getUniqueOtp, ROLE_TYPES, sendSms } from "../../utils";
-import { userModel } from "../../database";
+import { apiResponse, generateHash, generateReferralCode, generateUserId, getUniqueOtp, ROLE_TYPES, sendSms } from "../../utils";
+import { classesModel, userModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { addUserSchema, deleteUserSchema, editUserSchema, getUserSchema } from "../../validation";
 
@@ -7,7 +7,7 @@ const ObjectId: any = require('mongoose').Types.ObjectId;
 
 export const add_user = async (req, res) => {
     reqInfo(req);
-    let { user } = req.headers, userId = null, prefix = "US";
+    let { user } = req.headers, userId = null, prefix = "US", referralCode = null;
     try {
         const { error, value } = addUserSchema.validate(req.body);
         if (error) {
@@ -36,12 +36,26 @@ export const add_user = async (req, res) => {
         value.otp = otp
         value.isMobileVerified = false
 
+        let referralCodeExist = await userModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
+        if(!referralCodeExist) referralCodeExist = await classesModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
+        if(!referralCodeExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("referralCode"), {}, {}))
+        
         while (!userId) {
             let temp = generateUserId(prefix);
             const copy = await userModel.findOne({ uniqueId: temp, isDeleted: false });
             if (!copy) userId = temp;
         }
+        
+        while (!referralCode) {
+            let temp = generateReferralCode();
+            const copy = await userModel.findOne({ referralCode: temp, isDeleted: false });
+            if (!copy) referralCode = temp;
+        }
+
+        if(value?.referralCode) value.friendReferralCode = value?.referralCode
+        
         value.uniqueId = userId;
+        value.referralCode = referralCode;
 
         const response = await new userModel(value).save();
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}));

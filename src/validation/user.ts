@@ -28,7 +28,6 @@ export const editUserSchema = Joi.object().keys({
     dob: Joi.date().optional(),
     city: Joi.string().optional(),
     language: Joi.string().optional(),
-    referralCode: Joi.string().optional(),
     contact: Joi.object().keys({
         countryCode: Joi.string().optional(),
         mobile: Joi.string().optional()

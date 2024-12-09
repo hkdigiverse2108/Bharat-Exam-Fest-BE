@@ -3532,6 +3532,41 @@
         }
       }
     },
+    "/qa/why-false": {
+      "post": {
+        "tags": ["QA"],
+        "description": "Add a new 'QA' why false",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "answerId": {
+                    "type": "string"
+                  },
+                  "whyFalse": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "qa why false added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/transaction/add": {
       "post": {
         "tags": ["Transaction"],

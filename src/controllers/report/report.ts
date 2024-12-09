@@ -14,13 +14,13 @@ export const get_report = async (req, res) => {
                 let qaTypeSummaryReport = await qa_type_summary_report(req, res);
                 return { polity, qaSubtopicSummary, qaTypeSummaryReport };
             })(),
-            
+
             (async () => {
-                let qaTypeStrategyReport = await qa_type_strategy_report(req, res);
+                let qaTypeStrategyReport = await strategy_wise_comparison(req, res);
                 let compareWithCompetitor = await compare_with_competitor(req, res);
                 return { qaTypeStrategyReport, compareWithCompetitor };
             })(),
-            
+
             (async () => {
                 let qaTypeStrategyWiseComparison = await qa_type_strategy_wise_comparison(req, res)
                 let eliminationReport = await elimination_skill_report(req, res)
@@ -188,7 +188,6 @@ export const qa_type_strategy_report = async (req, res) => {
         return response
     } catch (error) {
         console.log(error);
-        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 };
 
@@ -276,7 +275,6 @@ export const subtopic_summary_report = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Internal Server Error', error });
     }
 };
 
@@ -339,71 +337,211 @@ export const qa_type_summary_report = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Internal Server Error', error });
     }
 };
 
-export const qa_type_strategy_wise_report = async (req, res) => {
-    let { user } = req.headers, { contestFilter, qaFilter } = req.query, match: any = {};
+export const strategy_wise_comparison = async (req, res) => {
+    const { user } = req.headers; // logged-in user ID
+    const { contestFilter, qaFilter } = req.query; // any additional filters
+
     try {
+        let qa = await qaModel.findOne({ _id: new ObjectId(qaFilter) });
+        if (!qa) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("QA"), {}, {}));
 
-        if (contestFilter) match.contestId = new ObjectId(contestFilter);
-        if (qaFilter) match._id = new ObjectId(qaFilter);
-        if (user) match.userId = new ObjectId(user?._id);
-        console.log("match => ", match);
-
-        let results = await qaModel.aggregate([
-            { $match: match },
-            { $unwind: '$answers' },
+        let allUsersData = await qaModel.aggregate([
+            { $match: { contestId: new ObjectId(contestFilter), contestStartDate: qa?.contestStartDate, contestEndDate: qa?.contestEndDate, isDeleted: false } },
+            { $unwind: "$answers" },
             {
                 $group: {
-                    _id: '$answers.type', // Group by answer type
-                    totalQuestions: { $sum: 1 },
-                    correctAnswers: {
-                        $sum: {
-                            $cond: ['$answers.isAnsweredTrue', 1, 0] // Use isAnsweredTrue
-                        }
-                    }
-                }
-            },
-            {
-                $project: {
-                    type: '$_id',
-                    percentage: {
-                        $round: [{ $multiply: [{ $divide: ['$correctAnswers', '$totalQuestions'] }, 100] }, 0]
-                    }
+                    _id: {
+                        userId: "$userId",
+                        type: "$answers.type"
+                    },
+                    totalCorrect: { $sum: { $cond: [{ $eq: ["$answers.isAnsweredTrue", true] }, 1, 0] } },
+                    totalIncorrect: { $sum: { $cond: [{ $eq: ["$answers.isAnsweredTrue", false] }, 1, 0] } }
                 }
             }
         ]);
 
-        // Categorize results
-        let categorizedResults = {
-            'Very Weak': [],
-            'Weak': [],
-            'Average': [],
-            'Strong': [],
-            'Very Strong': []
-        };
+        const result = {};
 
-        results.forEach(result => {
-            let category;
-            if (result.percentage >= 80) category = 'Very Strong';
-            else if (result.percentage >= 60) category = 'Strong';
-            else if (result.percentage >= 40) category = 'Average';
-            else if (result.percentage >= 20) category = 'Weak';
-            else category = 'Very Weak';
+        const strategyTypes = Object.values(Q_A_TYPE);
 
-            categorizedResults[category].push({
-                type: result.type,
-                percentage: result.percentage
-            });
+        strategyTypes.forEach(type => {
+            const youData = allUsersData.find(data => data._id.userId.toString() === user._id.toString() && data._id.type === type);
+            const othersData = allUsersData.filter(data => data._id.userId.toString() !== user._id.toString() && data._id.type === type);
+
+            const othersCorrect = othersData.reduce((acc, data) => acc + data.totalCorrect, 0);
+            const othersIncorrect = othersData.reduce((acc, data) => acc + data.totalIncorrect, 0);
+
+            const toppers = othersData.reduce((max, data) => (data.totalCorrect > max.totalCorrect ? data : max), { totalCorrect: 0 });
+
+            const youAccuracy = youData ? Math.round((youData.totalCorrect * 100) / (youData.totalCorrect + youData.totalIncorrect)) : 0;
+            const othersAccuracy = Math.round((othersCorrect * 100) / (othersCorrect + othersIncorrect));
+            const toppersAccuracy = Math.round((toppers.totalCorrect * 100) / (toppers.totalCorrect + toppers.totalIncorrect));
+
+            result[type] = {
+                you: {
+                    correct: youData?.totalCorrect || 0,
+                    incorrect: youData?.totalIncorrect || 0,
+                    accuracy: youAccuracy || 0
+                },
+                others: {
+                    correct: othersCorrect,
+                    incorrect: othersIncorrect,
+                    accuracy: othersAccuracy || 0
+                },
+                toppers: {
+                    correct: toppers.totalCorrect || 0,
+                    incorrect: toppers.totalIncorrect || 0,
+                    accuracy: toppersAccuracy || 0
+                }
+            };
         });
 
-        return categorizedResults
+        // Separate logic for 50-50 and 1-OPT Eliminate
+        const specialStrategies = ["50-50", "1-OPT Eliminate"];
+        for (const strategy of specialStrategies) {
+            const strategyData = await qaModel.aggregate([
+                { $match: { contestId: new ObjectId(contestFilter), contestStartDate: qa?.contestStartDate, contestEndDate: qa?.contestEndDate, isDeleted: false } },
+                { $unwind: "$answers" },
+                {
+                    $match: {
+                        "answers.eliminateOption": strategy === "50-50" ? { $gte: 2 } : 1
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$userId",
+                        totalCorrect: { $sum: { $cond: [{ $eq: ["$answers.isAnsweredTrue", true] }, 1, 0] } },
+                        totalIncorrect: { $sum: { $cond: [{ $eq: ["$answers.isAnsweredTrue", false] }, 1, 0] } }
+                    }
+                }
+            ]);
+
+            const youData = strategyData.find(data => data._id.toString() === user._id.toString());
+            const othersData = strategyData.filter(data => data._id.toString() !== user._id.toString());
+
+            const othersCorrect = othersData.reduce((acc, data) => acc + data.totalCorrect, 0);
+            const othersIncorrect = othersData.reduce((acc, data) => acc + data.totalIncorrect, 0);
+
+            const toppers = othersData.reduce((max, data) => (data.totalCorrect > max.totalCorrect ? data : max), { totalCorrect: 0 });
+
+            const youAccuracy = youData ? Math.round((youData.totalCorrect * 100) / (youData.totalCorrect + youData.totalIncorrect)) : 0;
+            const othersAccuracy = Math.round((othersCorrect * 100) / (othersCorrect + othersIncorrect));
+            const toppersAccuracy = Math.round((toppers.totalCorrect * 100) / (toppers.totalCorrect + toppers.totalIncorrect));
+
+            result[strategy] = {
+                you: {
+                    correct: youData?.totalCorrect || 0,
+                    incorrect: youData?.totalIncorrect || 0,
+                    accuracy: youAccuracy || 0
+                },
+                others: {
+                    correct: othersCorrect,
+                    incorrect: othersIncorrect,
+                    accuracy: othersAccuracy || 0
+                },
+                toppers: {
+                    correct: toppers.totalCorrect || 0,
+                    incorrect: toppers.totalIncorrect || 0,
+                    accuracy: toppersAccuracy || 0
+                }
+            };
+        }
+
+        return result
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Internal Server Error', error });
+    }
+};
+
+export const subtopic_wise_comparison = async (req, res) => {
+    const { user } = req.headers; // logged-in user ID
+    const { contestFilter, qaFilter } = req.query; // any additional filters
+
+    try {
+        let qa = await qaModel.findOne({ _id: new ObjectId(qaFilter) });
+        if (!qa) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("QA"), {}, {}));
+
+        let allUsersData = await qaModel.aggregate([
+            { $match: { contestId: new ObjectId(contestFilter), contestStartDate: qa?.contestStartDate, contestEndDate: qa?.contestEndDate, isDeleted: false } },
+            { $unwind: "$answers" },
+            {
+                $lookup: {
+                    from: 'questions',
+                    localField: 'answers.questionId',
+                    foreignField: '_id',
+                    as: 'questionDetails'
+                }
+            },
+            { $unwind: '$questionDetails' },
+            { $unwind: '$questionDetails.subtopicIds' }, // Unwind subtopicIds
+            {
+                $lookup: {
+                    from: 'sub-topics',
+                    localField: 'questionDetails.subtopicIds',
+                    foreignField: '_id',
+                    as: 'subtopicDetails'
+                }
+            },
+            { $unwind: '$subtopicDetails' }, // Unwind subtopicDetails
+            {
+                $group: {
+                    _id: {
+                        userId: "$userId",
+                        subtopicId: "$questionDetails.subtopicIds",
+                        subtopicName: "$subtopicDetails.name"
+                    },
+                    totalCorrect: { $sum: { $cond: [{ $eq: ["$answers.isAnsweredTrue", true] }, 1, 0] } },
+                    totalIncorrect: { $sum: { $cond: [{ $eq: ["$answers.isAnsweredTrue", false] }, 1, 0] } }
+                }
+            }
+        ]);
+
+        const result: Record<string, any> = {};
+
+        allUsersData.forEach(data => {
+            const subtopicId = data._id.subtopicId.toString();
+            const subtopicName = data._id.subtopicName;
+
+            const youData = allUsersData.find(d => d._id.userId.toString() === user._id.toString() && d._id.subtopicId.toString() === subtopicId);
+            const othersData = allUsersData.filter(d => d._id.userId.toString() !== user._id.toString() && d._id.subtopicId.toString() === subtopicId);
+
+            const othersCorrect = othersData.reduce((acc, d) => acc + d.totalCorrect, 0);
+            const othersIncorrect = othersData.reduce((acc, d) => acc + d.totalIncorrect, 0);
+
+            const toppers = othersData.reduce((max, d) => (d.totalCorrect > max.totalCorrect ? d : max), { totalCorrect: 0 });
+
+            const youAccuracy = youData ? Math.round((youData.totalCorrect * 100) / (youData.totalCorrect + youData.totalIncorrect)) : 0;
+            const othersAccuracy = Math.round((othersCorrect * 100) / (othersCorrect + othersIncorrect));
+            const toppersAccuracy = Math.round((toppers.totalCorrect * 100) / (toppers.totalCorrect + toppers.totalIncorrect));
+
+            result[subtopicId] = {
+                subtopicName,
+                you: {
+                    correct: youData?.totalCorrect || 0,
+                    incorrect: youData?.totalIncorrect || 0,
+                    accuracy: youAccuracy || 0
+                },
+                others: {
+                    correct: othersCorrect,
+                    incorrect: othersIncorrect,
+                    accuracy: othersAccuracy || 0
+                },
+                toppers: {
+                    correct: toppers.totalCorrect || 0,
+                    incorrect: toppers.totalIncorrect || 0,
+                    accuracy: toppersAccuracy || 0
+                }
+            };
+        });
+
+        return result;
+
+    } catch (error) {
+        console.error(error);
     }
 };
 
@@ -464,9 +602,6 @@ export const compare_with_competitor = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json(
-            new apiResponse(500, responseMessage?.internalServerError, {}, error)
-        );
     }
 };
 
@@ -582,9 +717,6 @@ export const qa_type_strategy_wise_comparison = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json(
-            new apiResponse(500, responseMessage?.internalServerError, {}, error)
-        );
     }
 };
 
@@ -904,6 +1036,5 @@ export const elimination_skill_report = async (req, res) => {
         return response
     } catch (error) {
         console.log(error);
-        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 };

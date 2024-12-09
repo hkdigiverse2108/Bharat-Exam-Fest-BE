@@ -9,6 +9,7 @@ const transactionSchema: any = new mongoose.Schema({
     transactionType: { type: String, enum: Object.values(TRANSACTION_TYPE), default: TRANSACTION_TYPE.DEPOSIT },
     transactionStatus: { type: String, enum: Object.values(TRANSACTION_STATUS), default: null },
     transactionId: { type: String, default: null },
+    description: { type: String, default: null },
     isDeleted: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
     createdBy: { type: mongoose.Schema.Types.ObjectId, default: null },

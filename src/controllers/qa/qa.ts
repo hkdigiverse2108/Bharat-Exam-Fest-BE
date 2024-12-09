@@ -1,6 +1,6 @@
-import { contestModel, contestRankModel, qaModel, questionModel } from "../../database"
+import { classesModel, contestModel, contestRankModel, qaModel, questionModel, transactionModel, userModel } from "../../database"
 import { reqInfo, responseMessage } from "../../helper"
-import { apiResponse, ROLE_TYPES } from "../../utils"
+import { apiResponse, ROLE_TYPES, TRANSACTION_STATUS, TRANSACTION_TYPE } from "../../utils"
 
 let ObjectId = require("mongoose").Types.ObjectId
 
@@ -24,6 +24,10 @@ export const add_qa = async (req, res) => {
         let contest = await contestModel.findOneAndUpdate({ _id: new ObjectId(body.contestId) }, { $inc: { filledSpots: 1 } }, { new: true })
         if (!contest) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("contest"), {}, {}))
 
+        if(user?.walletBalance < 0){
+            return res.status(404).json(new apiResponse(404, responseMessage?.insufficientBalance, {}, {}))
+        }
+
         if (contest) {
             contest.pricePool = contest?.totalSpots * contest?.fees / 2
             await contest.save()
@@ -35,7 +39,17 @@ export const add_qa = async (req, res) => {
 
         const response = await new qaModel(body).save();
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}))
-
+        
+        if(user?.userType === ROLE_TYPES.USER && user?.friendReferralCode){
+            let userData = await userModel.findOneAndUpdate({ referralCode: user?.friendReferralCode }, { $inc: { walletBalance: 5 } }, { new: true })
+            await new transactionModel({
+                userId: new ObjectId(userData._id),
+                amount: 0,
+                transactionType: TRANSACTION_TYPE.DEPOSIT,
+                transactionStatus: TRANSACTION_STATUS.SUCCESS,
+                description: "Referral bonus"
+            }).save()
+        }
         return res.status(200).json(new apiResponse(200, responseMessage?.addDataSuccess("question"), response, {}))
     } catch (error) {
         console.log("error", error);
@@ -238,9 +252,39 @@ export const get_all_qa = async (req, res) => {
             }
         ]);
 
+        const questionStats = await qaModel.aggregate([
+            { $unwind: "$answers" },
+            {
+                $group: {
+                    _id: "$answers.questionId",
+                    totalQuestions: { $sum: 1 },
+                    answeredQuestions: {
+                        $sum: {
+                            $cond: [{ $ne: ["$answers.isAnsweredTrue", null] }, 1, 0]
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    totalQuestions: 1,
+                    answeredQuestions: 1,
+                    percentageAnswered: {
+                        $cond: {
+                            if: { $eq: ["$totalQuestions", 0] },
+                            then: 0,
+                            else: { $multiply: [{ $divide: ["$answeredQuestions", "$totalQuestions"] }, 100] }
+                        }
+                    }
+                }
+            }
+        ]);
+
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), {
             contest_type_data: response[0]?.data || [],
             totalData: response[0]?.data_count[0]?.count || 0,
+            questionStats: questionStats,
             state: {
                 page: page,
                 limit: limit,
@@ -419,7 +463,6 @@ export const assignContestRanks = async () => {
     }
 };
 
-
 export const get_all_contest_ranks = async (req, res) => {
     reqInfo(req)
     let { contestFilter, qaFilter } = req.query, { user } = req.headers, match: any = {}
@@ -432,5 +475,19 @@ export const get_all_contest_ranks = async (req, res) => {
     } catch (error) {
         console.log("error =>", error)
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}
+
+export const update_qa_by_answer_id = async (req, res) => {
+    reqInfo(req)
+    let { answerId, whyFalse } = req.body
+    try {
+        const result = await qaModel.findOneAndUpdate({ "answers._id": new ObjectId(answerId) }, { "answers.$.whyFalse": whyFalse }, { new: true })
+
+        if (!result) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("qa"), {}, {}));
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), result, {}));
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 }
