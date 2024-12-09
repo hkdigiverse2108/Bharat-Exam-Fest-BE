@@ -23,6 +23,7 @@ import { transactionRouter } from "./transaction";
 import { questionReportRouter } from "./question-report";
 import { resultReportRouter } from "./result-report";
 import { reportRouter } from "./report";
+import { pdfRouter } from "./pdf";
 
 const router = Router()
 
@@ -30,6 +31,7 @@ router.use('/auth', authRouter)
 router.use('/user', userRouter)
 
 router.use(adminJWT)
+
 router.use('/subject', subjectRouter)
 router.use('/classes', classesRouter)
 router.use('/contest', contestRouter)
@@ -50,5 +52,6 @@ router.use('/transaction', transactionRouter)
 router.use('/question-report', questionReportRouter)
 router.use('/result-report', resultReportRouter)
 router.use('/report', reportRouter)
+router.use('/pdf', pdfRouter)
 
 export default router

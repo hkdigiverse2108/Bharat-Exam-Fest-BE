@@ -12,7 +12,7 @@
       "url": "https://api-bef.bharatexamfest.com"
     },
     {
-      "url": "http://localhost:5000"
+      "url": "http://localhost:4000"
     },
     {
       "url": "http://62.72.58.17"
@@ -3138,8 +3138,8 @@
     "/upload": {
       "post": {
         "tags": ["Upload"],
-        "summary": "Upload an image",
-        "description": "Uploads an image and returns the URL of the uploaded image.",
+        "summary": "Upload an image or a PDF",
+        "description": "Uploads an image or a PDF (terms-condition or privacy policy) and returns the URL of the uploaded file.",
         "requestBody": {
           "required": true,
           "content": {
@@ -3151,15 +3151,26 @@
                     "type": "string",
                     "format": "binary",
                     "description": "The image file to upload"
+                  },
+                  "pdf": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The PDF file to upload"
+                  },
+                  "pdfType": {
+                    "type": "string",
+                    "enum": ["terms-condition", "privacy-policy"],
+                    "description": "Type of the PDF file"
                   }
-                }
+                },
+                "required": ["pdfType"]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Image uploaded successfully"
+            "description": "File uploaded successfully"
           },
           "400": {
             "description": "Invalid input"
@@ -3169,47 +3180,7 @@
           }
         }
       }
-    },
-    "/upload/pdf": {
-      "post": {
-        "tags": ["Upload"],
-        "summary": "Upload a PDF file",
-        "description": "Uploads a PDF file and stores or updates its associated URL in the database.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "description": "The type associated with the PDF file"
-                  },
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "The PDF file to upload"
-                  }
-                },
-                "required": ["file"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "PDF uploaded successfully"
-          },
-          "400": {
-            "description": "Bad request (e.g., missing or invalid file type, missing type field for PDF uploads)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },    
+    },   
     "/qa/add": {
       "post": {
         "tags": ["QA"],
@@ -4052,6 +4023,34 @@
         "responses": {
           "200": {
             "description": "List of report FAQs"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/pdf": {
+      "get": {
+        "tags": ["PDF"],
+        "description": "Get all PDF entries",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "PDF type"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of 'How to Play' entries"
+          },
+          "404": {
+            "description": "'How to Play' entries not found"
           },
           "500": {
             "description": "Internal server error"

@@ -38,6 +38,7 @@ jspm_packages/
 *.njsproj
 *.sln
 images/
+pdfs/
 
 # OS generated files
 .DS_Store

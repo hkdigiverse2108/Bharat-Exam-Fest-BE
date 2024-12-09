@@ -19,7 +19,8 @@ import { assignContestRanksUser, removeOutdatedSlots } from './helper/cron';
 
 const app = express();
 
-app.use("/images", express.static(path.join(__dirname, ".." , "images")));
+app.use("/images", express.static(path.join(__dirname, "..", "images")));
+app.use("/pdfs", express.static(path.join(__dirname, ".." , "pdfs")));
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -51,7 +52,11 @@ app.set("views", path.join(__dirname, "views"));
 app.use(cors())
 app.use(mongooseConnection)
 app.use(bodyParser.json({ limit: '200mb' }))
-app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("image"));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'pdf', maxCount: 1 }
+]));
+
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }))
 
 app.use((req, res, next) => {
