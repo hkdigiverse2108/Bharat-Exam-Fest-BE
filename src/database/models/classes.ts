@@ -20,6 +20,8 @@ const classesSchema: any = new mongoose.Schema({
         swiftCode: { type: String }
     },
     referralCode: { type: String },
+    termsAndConditions: { type: String },
+    privacyPolicy: { type: String },
     password: { type: String },
     image: { type: String },
     userType: { type: String, enum: Object.values(ROLE_TYPES), default: ROLE_TYPES.CLASSES },

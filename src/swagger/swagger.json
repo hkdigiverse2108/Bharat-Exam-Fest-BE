@@ -1024,6 +1024,12 @@
                   "email": {
                     "type": "string"
                   },
+                  "termsAndConditions": {
+                    "type": "string"
+                  },
+                  "privacyPolicy": {
+                    "type": "string"
+                  },
                   "country": {
                     "type": "string"
                   },
@@ -1111,6 +1117,12 @@
                     "type": "string"
                   },
                   "country": {
+                    "type": "string"
+                  },
+                  "termsAndConditions": {
+                    "type": "string"
+                  },
+                  "privacyPolicy": {
                     "type": "string"
                   },
                   "referralCode": {

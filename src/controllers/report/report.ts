@@ -731,20 +731,6 @@ export const elimination_skill_report = async (req, res) => {
         let qa = await qaModel.aggregate([
             { $match: match },
             {
-                $project: {
-                    totalPoints: 1,
-                    totalRightAnswer: 1,
-                    totalWrongAnswer: 1,
-                    totalSkippedAnswer: 1,
-                    contestStartDate: 1,
-                    contestEndDate: 1,
-                    answers: 1,
-                    totalQuestions: {
-                        $add: ["$totalRightAnswer", "$totalWrongAnswer", "$totalSkippedAnswer"]
-                    }
-                }
-            },
-            {
                 $addFields: {
                     correct: "$totalRightAnswer",
                     incorrect: "$totalWrongAnswer",
@@ -1024,16 +1010,254 @@ export const elimination_skill_report = async (req, res) => {
             }
         ]);
 
+        let qaTypeMetrics = await qaModel.aggregate([
+            { $match: match },
+            {
+                $addFields: {
+                    correct: "$totalRightAnswer",
+                    incorrect: "$totalWrongAnswer",
+                    unanswered: "$totalSkippedAnswer",
+                    timeTaken: {
+                        $divide: [
+                            { $subtract: ["$contestEndDate", "$contestStartDate"] },
+                            1000
+                        ]
+                    },
+                    qaTypeMetrics: {
+                        fiftyFifty: {
+                            correctPercentage: {
+                                $cond: {
+                                    if: {
+                                        $eq: [
+                                            {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $eq: ["$$answer.eliminateOption", 2]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            0
+                                        ]
+                                    },
+                                    then: 0,
+                                    else: {
+                                        $multiply: [
+                                            {
+                                                $divide: [
+                                                    {
+                                                        $size: {
+                                                            $filter: {
+                                                                input: "$answers",
+                                                                as: "answer",
+                                                                cond: {
+                                                                    $and: [
+                                                                        { $eq: ["$$answer.isAnsweredTrue", true] },
+                                                                        { $eq: ["$$answer.eliminateOption", 2] }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        $size: {
+                                                            $filter: {
+                                                                input: "$answers",
+                                                                as: "answer",
+                                                                cond: {
+                                                                    $eq: ["$$answer.eliminateOption", 2]
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            100
+                                        ]
+                                    }
+                                }
+                            },
+                            incorrectPercentage: {
+                                $cond: {
+                                    if: {
+                                        $eq: [
+                                            {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $eq: ["$$answer.eliminateOption", 2]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            0
+                                        ]
+                                    },
+                                    then: 0,
+                                    else: {
+                                        $multiply: [
+                                            {
+                                                $divide: [
+                                                    {
+                                                        $size: {
+                                                            $filter: {
+                                                                input: "$answers",
+                                                                as: "answer",
+                                                                cond: {
+                                                                    $and: [
+                                                                        { $eq: ["$$answer.isAnsweredTrue", false] },
+                                                                        { $eq: ["$$answer.eliminateOption", 2] }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        $size: {
+                                                            $filter: {
+                                                                input: "$answers",
+                                                                as: "answer",
+                                                                cond: {
+                                                                    $eq: ["$$answer.eliminateOption", 2]
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            100
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        oneEliminate: {
+                            correctPercentage: {
+                                $cond: {
+                                    if: {
+                                        $eq: [
+                                            {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $eq: ["$$answer.eliminateOption", 1]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            0
+                                        ]
+                                    },
+                                    then: 0,
+                                    else: {
+                                        $multiply: [
+                                            {
+                                                $divide: [
+                                                    {
+                                                        $size: {
+                                                            $filter: {
+                                                                input: "$answers",
+                                                                as: "answer",
+                                                                cond: {
+                                                                    $and: [
+                                                                        { $eq: ["$$answer.isAnsweredTrue", true] },
+                                                                        { $eq: ["$$answer.eliminateOption", 1] }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        $size: {
+                                                            $filter: {
+                                                                input: "$answers",
+                                                                as: "answer",
+                                                                cond: {
+                                                                    $eq: ["$$answer.eliminateOption", 1]
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            100
+                                        ]
+                                    }
+                                }
+                            },
+                            incorrectPercentage: {
+                                $cond: {
+                                    if: {
+                                        $eq: [
+                                            {
+                                                $size: {
+                                                    $filter: {
+                                                        input: "$answers",
+                                                        as: "answer",
+                                                        cond: {
+                                                            $eq: ["$$answer.eliminateOption", 1]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            0
+                                        ]
+                                    },
+                                    then: 0,
+                                    else: {
+                                        $multiply: [
+                                            {
+                                                $divide: [
+                                                    {
+                                                        $size: {
+                                                            $filter: {
+                                                                input: "$answers",
+                                                                as: "answer",
+                                                                cond: {
+                                                                    $and: [
+                                                                        { $eq: ["$$answer.isAnsweredTrue", false] },
+                                                                        { $eq: ["$$answer.eliminateOption", 1] }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        $size: {
+                                                            $filter: {
+                                                                input: "$answers",
+                                                                as: "answer",
+                                                                cond: {
+                                                                    $eq: ["$$answer.eliminateOption", 1]
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            100
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ]);
 
         let response = {
-            totalPoints: qa[0]?.totalPoints || 0,
-            correct: qa[0]?.correct || 0,
-            incorrect: qa[0]?.incorrect || 0,
-            unanswered: qa[0]?.unanswered || 0,
-            time: qa[0]?.timeTaken || 0,
-            qaTypeMetrics: qa[0]?.qaTypeMetrics || {}
+            qa: qa[0]?.qaTypeMetrics || {},
+            qaTypeMetrics: qaTypeMetrics[0]?.qaTypeMetrics || {},
         }
-        return response
+        return response;
     } catch (error) {
         console.log(error);
     }

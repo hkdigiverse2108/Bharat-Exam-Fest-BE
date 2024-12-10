@@ -35,14 +35,6 @@ router.post("", async (req: any, res: any) => {
                 fs.mkdirSync(pdfDir, { recursive: true });
             }
 
-            // Remove existing files of the same type if they exist
-            const existingFiles = fs.readdirSync(pdfDir);
-            existingFiles.forEach(existingFile => {
-                if (existingFile.endsWith('.pdf')) { // Check if the existing file is a PDF
-                    fs.unlinkSync(path.join(pdfDir, existingFile)); // Remove the existing file
-                }
-            });
-
             const filePath = await path.join(pdfDir, file.filename);
 
             fs.renameSync(file.path, filePath);

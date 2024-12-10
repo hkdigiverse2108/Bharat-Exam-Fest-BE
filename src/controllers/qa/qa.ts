@@ -44,7 +44,7 @@ export const add_qa = async (req, res) => {
             let userData = await userModel.findOneAndUpdate({ referralCode: user?.friendReferralCode }, { $inc: { walletBalance: 5 } }, { new: true })
             await new transactionModel({
                 userId: new ObjectId(userData._id),
-                amount: 0,
+                amount: 5,
                 transactionType: TRANSACTION_TYPE.DEPOSIT,
                 transactionStatus: TRANSACTION_STATUS.SUCCESS,
                 description: "Referral bonus"
