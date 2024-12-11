@@ -26,6 +26,7 @@ const classesSchema: any = new mongoose.Schema({
     image: { type: String },
     userType: { type: String, enum: Object.values(ROLE_TYPES), default: ROLE_TYPES.CLASSES },
     otp: { type: String },
+    isForAllUsers: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
     isEmailVerified: { type: Boolean, default: false },

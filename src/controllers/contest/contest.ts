@@ -1,5 +1,5 @@
 import { apiResponse, generateHourlySlots, ROLE_TYPES } from "../../utils";
-import { contestModel, qaModel } from "../../database";
+import { classesModel, contestModel, qaModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { addContestSchema, deleteContestSchema, editContestSchema, getContestSchema } from "../../validation";
 
@@ -23,7 +23,7 @@ export const add_contest = async (req, res) => {
             const slots = generateHourlySlots(startDate, endDate);
             value.slots = slots; // Assuming you want to store these slots in the contest model
         }
-        console.log("value.slots => ", value.slots);
+        
         const response = await new contestModel(value).save();
         if (!response) return res.status(404).json(new apiResponse(404, responseMessage?.addDataError, {}, {}));
         return res.status(200).json(new apiResponse(200, responseMessage?.addDataSuccess("contest"), response, {}));
@@ -126,6 +126,16 @@ export const get_all_contests = async (req, res) => {
             let qasId = await qas.map(e => new ObjectId(e.contestId))
             match._id = { $nin: qasId }
         }
+
+        if(user?.classesShow && user?.userType === ROLE_TYPES.USER){
+            if(user?.friendReferralCode){
+                let classes = await classesModel.findOne({ referralCode: user?.friendReferralCode, isDeleted: false })
+                if(classes){
+                    match.classesId = new ObjectId(classes._id)
+                }
+            }
+        }
+
         response = await contestModel.aggregate([
             { $match: match },
             {

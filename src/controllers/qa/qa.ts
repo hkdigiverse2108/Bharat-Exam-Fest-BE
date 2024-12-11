@@ -153,6 +153,15 @@ export const get_all_qa = async (req, res) => {
             match2["contest.totalSpots"] = { $gte: Number(sportFilter.min), $lte: Number(sportFilter.max) };
         }
 
+        if(user?.classesShow && user?.userType === ROLE_TYPES.USER){
+            if(user?.friendReferralCode){
+                let classes = await classesModel.findOne({ referralCode: user?.friendReferralCode, isDeleted: false })
+                if(classes){
+                    match.classesId = new ObjectId(classes._id)
+                }
+            }
+        }
+
         response = await qaModel.aggregate([
             { $match: match },
             {

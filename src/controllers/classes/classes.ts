@@ -89,7 +89,7 @@ export const delete_classes_by_id = async (req, res) => {
 
 export const get_all_classes = async (req, res) => {
     reqInfo(req)
-    let match: any = {}, { page, limit, search } = req.query
+    let match: any = {}, { page, limit, search } = req.query, { user } = req.headers
     try {
         page = Number(page)
         limit = Number(limit)
@@ -102,6 +102,22 @@ export const get_all_classes = async (req, res) => {
                 { email: { $regex: search, $options: 'i' } },
                 { title: { $regex: search, $options: 'i' } }
             ]
+        }
+
+        if (user.userType === ROLE_TYPES.USER) {
+            if (user?.friendReferralCode) {
+                let classes = await classesModel.find({ referralCode: user?.friendReferralCode, isDeleted: false }).lean();
+                if (classes && classes.length > 0) {
+                    match.$or = [
+                        { isForAllUsers: true },
+                        { _id: { $in: classes.map(item => new ObjectId(item._id)) } }
+                    ];
+                } else {
+                    match.isForAllUsers = true; // Fallback if no classes found
+                }
+            } else {
+                match.isForAllUsers = true; // Fallback if no referral code
+            }
         }
 
         const response = await classesModel.aggregate([

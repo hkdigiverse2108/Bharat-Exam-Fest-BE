@@ -9,6 +9,7 @@ const contestSchema: any = new mongoose.Schema({
     totalSpots: { type: Number, default: 0 },
     filledSpots: { type: Number, default: 0 },
     fees: { type: Number },
+    classesFees: { type: Number },
     winningAmountPerFee: { type: Number },
     pricePool: { type: Number, default: 0 },
     ranks: [

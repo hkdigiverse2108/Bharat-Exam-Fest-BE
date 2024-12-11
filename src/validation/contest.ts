@@ -14,6 +14,7 @@ export const addContestSchema = Joi.object().keys({
         endPlace: Joi.string().optional(),
         price: Joi.number().optional()
     })).optional(),
+    classesFees: Joi.number().optional(),
     totalQuestions: Joi.number().optional(),
     totalTime: Joi.string().optional(), // e.g., "2 hours"
     totalMarks: Joi.number().optional(),
@@ -35,6 +36,7 @@ export const editContestSchema = Joi.object().keys({
         endPlace: Joi.string().optional(),
         price: Joi.number().optional()
     })).optional(),
+    classesFees: Joi.number().optional(),
     totalQuestions: Joi.number().optional(),
     totalTime: Joi.string().optional(),
     totalMarks: Joi.number().optional(),

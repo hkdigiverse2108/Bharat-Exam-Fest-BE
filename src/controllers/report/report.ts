@@ -17,8 +17,9 @@ export const get_report = async (req, res) => {
 
             (async () => {
                 let qaTypeStrategyReport = await strategy_wise_comparison(req, res);
+                let subtopicWiseReport = await subtopic_wise_comparison(req, res);
                 let compareWithCompetitor = await compare_with_competitor(req, res);
-                return { qaTypeStrategyReport, compareWithCompetitor };
+                return { qaTypeStrategyReport, subtopicWiseReport, compareWithCompetitor };
             })(),
 
             (async () => {
@@ -194,7 +195,6 @@ export const qa_type_strategy_report = async (req, res) => {
 export const subtopic_summary_report = async (req, res) => {
     let { user } = req.headers, { contestFilter, qaFilter } = req.query, match: any = {};
     try {
-
         if (contestFilter) match.contestId = new ObjectId(contestFilter);
         if (qaFilter) match._id = new ObjectId(qaFilter);
         if (user) match.userId = new ObjectId(user?._id);
@@ -255,7 +255,6 @@ export const subtopic_summary_report = async (req, res) => {
             'Strong': [],
             'Very Strong': []
         };
-
         results.forEach(result => {
             let category;
             if (result.percentage >= 80) category = 'Very Strong';
@@ -537,7 +536,7 @@ export const subtopic_wise_comparison = async (req, res) => {
                 }
             };
         });
-
+        console.log("result => ", result)
         return result;
 
     } catch (error) {

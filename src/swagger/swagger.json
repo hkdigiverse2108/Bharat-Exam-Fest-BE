@@ -804,6 +804,9 @@
                   "referralCode": {
                     "type": "string"
                   },
+                  "classesShow": {
+                    "type": "number"
+                  },
                   "contact": {
                     "type": "object",
                     "properties": {
@@ -1024,6 +1027,9 @@
                   "email": {
                     "type": "string"
                   },
+                  "isForAllUsers": {
+                    "type": "boolean"
+                  },
                   "termsAndConditions": {
                     "type": "string"
                   },
@@ -1118,6 +1124,9 @@
                   },
                   "country": {
                     "type": "string"
+                  },
+                  "isForAllUsers": {
+                    "type": "boolean"
                   },
                   "termsAndConditions": {
                     "type": "string"
@@ -1773,6 +1782,9 @@
                   "fees": {
                     "type": "number"
                   },
+                  "classesFees": {
+                    "type": "number"
+                  },
                   "winningAmountPerFee": {
                     "type": "number"
                   },
@@ -1857,6 +1869,9 @@
                     "type": "integer"
                   },
                   "fees": {
+                    "type": "number"
+                  },
+                  "classesFees": {
                     "type": "number"
                   },
                   "winningAmountPerFee": {
@@ -4042,27 +4057,24 @@
         }
       }
     },
-    "/pdf": {
+    "/dashboard": {
       "get": {
-        "tags": ["PDF"],
-        "description": "Get all PDF entries",
+        "tags": ["Dashboard"],
+        "summary": "Get all dashboard data",
         "parameters": [
           {
-            "name": "type",
+            "name": "dateFilter",
             "in": "query",
             "required": false,
             "schema": {
               "type": "string"
             },
-            "description": "PDF type"
+            "description": "Date filter"
           }
         ],
         "responses": {
           "200": {
-            "description": "A list of 'How to Play' entries"
-          },
-          "404": {
-            "description": "'How to Play' entries not found"
+            "description":"Dashboard data"
           },
           "500": {
             "description": "Internal server error"

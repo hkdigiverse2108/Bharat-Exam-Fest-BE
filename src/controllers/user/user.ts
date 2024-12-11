@@ -112,7 +112,7 @@ export const delete_user_by_id = async (req, res) => {
 
 export const get_all_users = async (req, res) => {
     reqInfo(req);
-    let { page, limit, search, blockFilter } = req.query;
+    let { page, limit, search, blockFilter } = req.query, { user } = req.headers;
     let response: any, match: any = {};
 
     try {
@@ -129,6 +129,14 @@ export const get_all_users = async (req, res) => {
                 { "contact.mobile": { $regex: search, $options: 'i' } }
             ]
         }
+
+        if(user?.userType === ROLE_TYPES.CLASSES){
+           let users = await userModel.find({ friendReferralCode: user?.referralCode, isDeleted: false, userType: ROLE_TYPES.USER }).select("_id").lean()
+           if(users){
+                match._id = { $in: users.map(e => new ObjectId(e._id)) }
+           }
+        }
+
         if(blockFilter){
             if(blockFilter === "true"){
                 match.isBlocked = true
@@ -136,6 +144,7 @@ export const get_all_users = async (req, res) => {
                 match.isBlocked = false
             }
         }
+        
         response = await userModel.aggregate([
             { $match: match }, 
             {

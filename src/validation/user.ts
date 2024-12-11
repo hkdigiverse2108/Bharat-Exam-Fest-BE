@@ -35,6 +35,7 @@ export const editUserSchema = Joi.object().keys({
     upscNumber: Joi.string().optional(),
     password: Joi.string().optional(),
     profileImage: Joi.string().optional(),
+    classesShow: Joi.boolean().optional(),
     isBlocked: Joi.boolean().optional()
 });
 

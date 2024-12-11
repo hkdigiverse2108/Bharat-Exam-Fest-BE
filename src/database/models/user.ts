@@ -22,6 +22,7 @@ const userSchema: any = new mongoose.Schema({
     profileImage: { type: String, default: null },
     friendReferralCode: { type: String, default: null },
     otp: { type: Number, default: null },
+    classesShow: { type: Boolean, default: false },
     userType: { type: String, enum: Object.values(ROLE_TYPES), default: ROLE_TYPES.USER },
     isDeleted: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
