@@ -1,5 +1,5 @@
-import { apiResponse, generateHash, generateReferralCode, generateUserId, getUniqueOtp, ROLE_TYPES, sendSms } from "../../utils";
-import { classesModel, userModel } from "../../database";
+import { apiResponse, generateHash, generateReferralCode, generateUserId, getUniqueOtp, ROLE_TYPES, sendSms, TRANSACTION_STATUS, TRANSACTION_TYPE } from "../../utils";
+import { classesModel, transactionModel, userModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { addUserSchema, deleteUserSchema, editUserSchema, getUserSchema } from "../../validation";
 
@@ -209,6 +209,37 @@ export const get_profile_image = async(req, res) => {
         let response = await userModel.findOne({_id: new ObjectId(req.params.id), isDeleted: false}).select("profileImage")
         if(!response) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("user"), {}, {}))
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("user"), response, {}))
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
+    }
+}
+
+export const get_user_wise_referral_code = async(req, res) => {
+    reqInfo(req)
+    let { user } = req.headers
+    console.log("user => ", user);
+    try {
+        let users = await userModel.find({ referralCode: user?.referralCode, isDeleted: false })
+        let responses:any = []
+        for(let user of users){
+            if(user?.userType === ROLE_TYPES.USER){
+                let transaction = await transactionModel.find({ userId: new ObjectId(user._id), transactionType: TRANSACTION_TYPE.DEPOSIT, transactionStatus: TRANSACTION_STATUS.SUCCESS, isDeleted: false, description: "Referral bonus" })
+                user.refferalCodeAmount = transaction.reduce((acc, curr) => acc + curr.amount, 0)
+                let reponse = {
+                    profileImage: user?.profileImage,
+                    firstName: user?.firstName,
+                    lastName: user?.lastName,
+                    amount: user?.refferalCodeAmount
+                }
+                responses.push(reponse)
+            }
+        }
+        let totalAmount = responses.reduce((acc, curr) => acc + curr.amount, 0)
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("user"), {
+            data: responses,
+            totalAmount: totalAmount
+        }, {}))
     } catch (error) {
         console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));

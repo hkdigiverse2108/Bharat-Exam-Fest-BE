@@ -18,6 +18,8 @@ const userSchema: any = new mongoose.Schema({
     walletBalance: { type: Number, default: 0 },
     uniqueId: { type: String },
     upscNumber: { type: String },
+    refferalCodeAmount: { type: Number, default: 0 },
+    contestAmount: { type: Number, default: 0 },
     password: { type: String, default: null },
     profileImage: { type: String, default: null },
     friendReferralCode: { type: String, default: null },

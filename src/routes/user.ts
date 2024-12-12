@@ -10,8 +10,9 @@ router.use(adminJWT)
 router.post('/edit', userController.edit_user_by_id)
 router.delete('/delete/:id', userController.delete_user_by_id)
 router.get('/all', userController.get_all_users)
+router.get('/profile-image/:id', userController.get_profile_image)
+router.get('/referrals', userController.get_user_wise_referral_code)
 router.get('/:id', userController.get_user_by_id)
 router.get('/', userController.get_all_user)
-router.get('/profile-image/:id', userController.get_profile_image)
 
 export let userRouter = router;

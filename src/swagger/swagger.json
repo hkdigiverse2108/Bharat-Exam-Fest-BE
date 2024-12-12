@@ -991,6 +991,17 @@
         } 
       }
     },
+    "/user/referrals": {
+      "get": {
+        "tags": ["User"],
+        "description": "Get a user referral code",
+        "responses": {
+          "200": {
+            "description": "User referral code"
+          }
+        }
+      }
+    },
     "/classes/add": {
       "post": {
         "tags": [
