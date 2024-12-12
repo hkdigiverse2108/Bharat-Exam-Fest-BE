@@ -83,6 +83,7 @@ export const edit_user_by_id = async (req, res) => {
 
         // isExist = await userModel.findOne({ "contact.mobile": value.contact.mobile, userType: ROLE_TYPES.USER, isDeleted: false, _id: { $ne: new ObjectId(value.userId) } })
         // if (isExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("mobile"), {}, {}))
+        if(value?.password) delete value.password
 
         value.updatedBy = new ObjectId(user?._id)
         const response = await userModel.findOneAndUpdate({ _id: new ObjectId(value.userId), isDeleted: false }, value, { new: true });
