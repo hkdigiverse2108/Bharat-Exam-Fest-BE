@@ -246,7 +246,7 @@ export const get_all_qa = async (req, res) => {
                 }
             },
             {
-                $addFields: { userRank: 0 }
+                $addFields: { userRank: "$rank" }
             },
             { $match: match2 },
             {
@@ -261,39 +261,52 @@ export const get_all_qa = async (req, res) => {
             }
         ]);
 
-        const questionStats = await qaModel.aggregate([
+        const questionAccuracy = await qaModel.aggregate([
+            { $match: match },  // Use the same initial match conditions
             { $unwind: "$answers" },
             {
                 $group: {
                     _id: "$answers.questionId",
-                    totalQuestions: { $sum: 1 },
-                    answeredQuestions: {
+                    totalAttempts: { 
+                        $sum: { 
+                            $cond: [
+                                { $ne: ["$answers.isAnsweredTrue", null] },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+                    correctAnswers: {
                         $sum: {
-                            $cond: [{ $ne: ["$answers.isAnsweredTrue", null] }, 1, 0]
+                            $cond: [
+                                { $eq: ["$answers.isAnsweredTrue", true] },
+                                1,
+                                0
+                            ]
                         }
                     }
                 }
             },
             {
                 $project: {
-                    _id: 1,
-                    totalQuestions: 1,
-                    answeredQuestions: 1,
-                    percentageAnswered: {
-                        $cond: {
-                            if: { $eq: ["$totalQuestions", 0] },
-                            then: 0,
-                            else: { $multiply: [{ $divide: ["$answeredQuestions", "$totalQuestions"] }, 100] }
-                        }
-                    }
+                    questionId: "$_id",
+                    accuracy: {
+                        $cond: [
+                            { $eq: ["$totalAttempts", 0] },
+                            0,
+                            { $multiply: [{ $divide: ["$correctAnswers", "$totalAttempts"] }, 100] }
+                        ]
+                    },
+                    totalAttempts: 1,
+                    correctAnswers: 1
                 }
             }
         ]);
 
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), {
             contest_type_data: response[0]?.data || [],
-            totalData: response[0]?.data_count[0]?.count || 0,
-            questionStats: questionStats,
+            accuracy: response[0]?.data_count[0]?.count || 0,
+            questionAccuracy: questionAccuracy,
             state: {
                 page: page,
                 limit: limit,
@@ -497,6 +510,19 @@ export const update_qa_by_answer_id = async (req, res) => {
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), result, {}));
     } catch (error) {
         console.error(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
+    }
+}
+
+export const mistake_map_report = async (req, res) => {
+    reqInfo(req)
+    let { user } = req.headers, { id } = req.params
+    try {
+        let response = await qaModel.find({ _id: new ObjectId(id), userId: new ObjectId(user._id), isDeleted: false }).lean()
+        if(!response) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("qa"), {}, {}))
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), response, {}))
+    } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 }
