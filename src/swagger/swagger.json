@@ -3565,6 +3565,25 @@
         }
       }
     },
+    "/qa/mistake-map/{id}": {
+      "get": {
+        "tags": ["QA"],
+        "summary": "Get mistake map report",
+        "parameters": [
+          { 
+            "name": "id", 
+            "in": "path", 
+            "required": true, 
+            "schema": { "type": "string" } 
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of mistake map report"
+          }
+        }
+      }
+    },
     "/transaction/add": {
       "post": {
         "tags": ["Transaction"],

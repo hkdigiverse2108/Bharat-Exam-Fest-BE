@@ -1,6 +1,6 @@
 import { classesModel, contestModel, contestRankModel, qaModel, questionModel, transactionModel, userModel } from "../../database"
 import { reqInfo, responseMessage } from "../../helper"
-import { apiResponse, ROLE_TYPES, TRANSACTION_STATUS, TRANSACTION_TYPE } from "../../utils"
+import { apiResponse, ROLE_TYPES, TRANSACTION_STATUS, TRANSACTION_TYPE, WHY_FALSE } from "../../utils"
 
 let ObjectId = require("mongoose").Types.ObjectId
 
@@ -518,9 +518,101 @@ export const mistake_map_report = async (req, res) => {
     reqInfo(req)
     let { user } = req.headers, { id } = req.params
     try {
-        let response = await qaModel.find({ _id: new ObjectId(id), userId: new ObjectId(user._id), isDeleted: false }).lean()
-        if(!response) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("qa"), {}, {}))
-        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), response, {}))
+        // First get the base qa document to count whyFalse occurrences
+        const qaDoc = await qaModel.findOne({ 
+            _id: new ObjectId(id), 
+            userId: new ObjectId(user._id), 
+            isDeleted: false 
+        }).lean();
+
+        if (!qaDoc) return res.status(404).json(new apiResponse(404, responseMessage?.getDataNotFound("qa"), {}, {}));
+
+        // Count whyFalse occurrences with type safety
+        const whyFalseCounts: { [key: string]: number } = qaDoc.answers.reduce((acc: { [key: string]: number }, answer) => {
+            if (answer.whyFalse) {
+                acc[answer.whyFalse] = (acc[answer.whyFalse] || 0) + 1;
+            }
+            return acc;
+        }, {});
+
+        // Calculate total mapped mistakes with type safety
+        const totalMapped: number = Object.values(whyFalseCounts).reduce((a: number, b: number) => a + b, 0);
+
+        // Initialize mistake map with proper typing
+        const mistakeMap: {
+            totalIncorrect: number;
+            mistakeMapped: number;
+            categories: {
+                [key: string]: {
+                    total: number;
+                    subtopics: {
+                        [key: string]: number;
+                    };
+                };
+            };
+        } = {
+            totalIncorrect: qaDoc.totalWrongAnswer || 0,
+            mistakeMapped: totalMapped,
+            categories: {}
+        };
+
+        // Initialize categories with type safety
+        Object.values(WHY_FALSE).forEach((category: string) => {
+            mistakeMap.categories[category] = {
+                total: whyFalseCounts[category] || 0,
+                subtopics: {}
+            };
+        });
+
+        // Get subtopic details
+        const subtopicResponse = await qaModel.aggregate([
+            { 
+                $match: { 
+                    _id: new ObjectId(id), 
+                    userId: new ObjectId(user._id), 
+                    isDeleted: false 
+                }
+            },
+            { $unwind: "$answers" },
+            { $match: { "answers.whyFalse": { $ne: null } } },
+            {
+                $lookup: {
+                    from: 'questions',
+                    let: { questionId: "$answers.questionId" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$_id", "$$questionId"] } } },
+                        {
+                            $lookup: {
+                                from: 'sub-topics',
+                                let: { subtopicIds: "$subtopicIds" },
+                                pipeline: [
+                                    { $match: { $expr: { $in: ["$_id", "$$subtopicIds"] } } }
+                                ],
+                                as: 'subtopics'
+                            }
+                        }
+                    ],
+                    as: 'question'
+                }
+            },
+            { $unwind: "$question" },
+            { $unwind: "$question.subtopics" }
+        ]);
+
+        // Add subtopic information with type safety
+        subtopicResponse.forEach((item: any) => {
+            const category = item.answers.whyFalse;
+            const subtopicName = item.question.subtopics.name;
+
+            if (category && subtopicName) {
+                if (!mistakeMap.categories[category].subtopics[subtopicName]) {
+                    mistakeMap.categories[category].subtopics[subtopicName] = 0;
+                }
+                mistakeMap.categories[category].subtopics[subtopicName]++;
+            }
+        });
+
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), mistakeMap, {}));
     } catch (error) {
         console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
