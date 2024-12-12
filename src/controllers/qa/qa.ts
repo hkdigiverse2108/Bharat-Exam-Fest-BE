@@ -612,7 +612,7 @@ export const mistake_map_report = async (req, res) => {
             }
         });
 
-        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("qa"), mistakeMap, {}));
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("mistake map"), mistakeMap, {}));
     } catch (error) {
         console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
