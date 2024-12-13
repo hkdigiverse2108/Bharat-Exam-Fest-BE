@@ -536,7 +536,6 @@ export const subtopic_wise_comparison = async (req, res) => {
                 }
             };
         });
-        console.log("result => ", result)
         return result;
 
     } catch (error) {

@@ -473,7 +473,6 @@ export const assignContestRanks = async () => {
             };
 
             let contestRank = await new contestRankModel(response).save();
-            console.log("result => ", result._id);
             await qaModel.findOneAndUpdate(
                 { _id: new ObjectId(result._id) },
                 { contestRankId: new ObjectId(contestRank._id) },

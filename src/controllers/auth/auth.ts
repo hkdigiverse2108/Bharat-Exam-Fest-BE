@@ -20,7 +20,6 @@ export const signUp = async (req, res) => {
         if (error) {
             return res.status(501).json(new apiResponse(501, error?.details[0]?.message, {}, {}));
         }
-        console.log("value => ", value);
         let isAlready: any = await getFirstMatch(userModel, {
             $or: [
                 { email: value?.email },
