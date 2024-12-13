@@ -218,7 +218,6 @@ export const get_profile_image = async(req, res) => {
 export const get_user_wise_referral_code = async(req, res) => {
     reqInfo(req)
     let { user } = req.headers
-    console.log("user => ", user);
     try {
         let users = await userModel.find({ referralCode: user?.referralCode, isDeleted: false })
         let responses:any = []
