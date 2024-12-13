@@ -12,10 +12,10 @@ const qaSchema: any = new mongoose.Schema({
     totalRightAnswer: { type: Number, default: 0 },
     totalWrongAnswer: { type: Number, default: 0 },
     totalSkippedAnswer: { type: Number, default: 0 },
-    contestStartDate: { type: Date, default: null },
-    contestEndDate: { type: Date, default: null },
-    contestStartTime: { type: Date, default: null },
-    contestEndTime: { type: Date, default: null },
+    contestStartDate: { type: Date, default: null },// user contest start date ex:- 12/12/2024 08:00 AM
+    contestEndDate: { type: Date, default: null },// user contest end date ex:- 12/12/2024 09:00 AM
+    contestStartTime: { type: Date, default: null },// user play start time ex: - 8: 20 AM
+    contestEndTime: { type: Date, default: null },// user play end time ex:- 8: 50 AM
     isPaid: { type: Boolean, default: false},
     rank: { type: Number, default: null },
     contestRankId: { type: mongoose.Schema.Types.ObjectId, ref: 'contest-rank', default: null },
