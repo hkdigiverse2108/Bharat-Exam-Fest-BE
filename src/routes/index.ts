@@ -25,6 +25,7 @@ import { resultReportRouter } from "./result-report";
 import { reportRouter } from "./report";
 import { pdfRouter } from "./pdf";
 import { dashboardRouter } from "./dashboard";
+import { feedbackRouter } from "./feedback";
 
 const router = Router()
 
@@ -55,5 +56,6 @@ router.use('/result-report', resultReportRouter)
 router.use('/report', reportRouter)
 router.use('/pdf', pdfRouter)
 router.use('/dashboard', dashboardRouter)
+router.use('/feedback', feedbackRouter)
 
 export default router

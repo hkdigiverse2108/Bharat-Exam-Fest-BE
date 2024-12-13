@@ -4111,6 +4111,144 @@
           }
         }
       }
+    },
+    "/feedback/add": {
+      "post": {
+        "tags": ["Feedback"],
+        "description": "Add a new feedback",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feedback": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback added successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/feedback/edit": {
+      "post": {
+        "tags": ["Feedback"],
+        "description": "Edit an existing feedback by ID",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feedbackId": {
+                    "type": "string"
+                  },
+                  "feedback": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback edited successfully"
+          },
+          "501": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/feedback/delete/{id}": {
+      "delete": {
+        "tags": ["Feedback"],
+        "description": "Delete a feedback by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feedback deleted successfully"
+          },
+          "404": {
+            "description": "Feedback not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/feedback/all": {
+      "get": {
+        "tags": ["Feedback"],
+        "description": "Get all feedback",
+        "responses": {
+          "200": {
+            "description": "A list of feedback"
+          },
+          "404": {
+            "description": "Feedback not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/feedback/{id}": {
+      "get": {
+        "tags": ["Feedback"],
+        "description": "Get a feedback by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feedback details"
+          },
+          "404": {
+            "description": "Feedback not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   }
 }
