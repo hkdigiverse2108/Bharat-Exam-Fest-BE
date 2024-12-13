@@ -4093,13 +4093,22 @@
         "summary": "Get all dashboard data",
         "parameters": [
           {
-            "name": "dateFilter",
+            "name": "dateFilter[startDate]",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            },
-            "description": "Date filter"
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "dateFilter[endDate]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "responses": {
