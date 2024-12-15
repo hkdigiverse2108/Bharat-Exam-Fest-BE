@@ -1002,6 +1002,17 @@
         }
       }
     },
+    "/user/winner-list": {
+      "get": {
+        "tags": ["User"],
+        "description": "Get a user winner list",
+        "responses": {
+          "200": {
+            "description": "User winner list"
+          }
+        }
+      }
+    },
     "/classes/add": {
       "post": {
         "tags": [

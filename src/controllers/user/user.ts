@@ -244,3 +244,237 @@ export const get_user_wise_referral_code = async(req, res) => {
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
     }
 }
+
+export const get_user_winner_list = async (req, res) => {
+    reqInfo(req);
+    let { user } = req.headers;
+
+    try {
+        // Define date ranges
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const lastWeek = new Date(today);
+        lastWeek.setDate(today.getDate() - 7);
+
+        const lastMonth = new Date(today);
+        lastMonth.setMonth(today.getMonth() - 1);
+
+        const lastYear = new Date(today);
+        lastYear.setFullYear(today.getFullYear() - 1);
+
+        const response = await transactionModel.aggregate([
+            {
+                $match: {
+                    isDeleted: false,
+                    transactionType: TRANSACTION_TYPE.DEPOSIT,
+                    transactionStatus: TRANSACTION_STATUS.SUCCESS,
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userInfo",
+                },
+            },
+            {
+                $unwind: "$userInfo",
+            },
+            {
+                $group: {
+                    _id: "$userId",
+                    totalAmount: { $sum: "$amount" },
+                    user: { $first: "$userInfo" },
+                    transactions: {
+                        $push: {
+                            amount: "$amount",
+                            createdAt: "$createdAt",
+                        },
+                    },
+                },
+            },
+            {
+                $addFields: {
+                    todayAmount: {
+                        $sum: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: "$transactions",
+                                        as: "transaction",
+                                        cond: {
+                                            $gte: ["$$transaction.createdAt", today],
+                                        },
+                                    },
+                                },
+                                as: "todayTransaction",
+                                in: "$$todayTransaction.amount",
+                            },
+                        },
+                    },
+                    yesterdayAmount: {
+                        $sum: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: "$transactions",
+                                        as: "transaction",
+                                        cond: {
+                                            $and: [
+                                                { $gte: ["$$transaction.createdAt", yesterday] },
+                                                { $lt: ["$$transaction.createdAt", today] },
+                                            ],
+                                        },
+                                    },
+                                },
+                                as: "yesterdayTransaction",
+                                in: "$$yesterdayTransaction.amount",
+                            },
+                        },
+                    },
+                    lastWeekAmount: {
+                        $sum: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: "$transactions",
+                                        as: "transaction",
+                                        cond: {
+                                            $gte: ["$$transaction.createdAt", lastWeek],
+                                        },
+                                    },
+                                },
+                                as: "lastWeekTransaction",
+                                in: "$$lastWeekTransaction.amount",
+                            },
+                        },
+                    },
+                    lastMonthAmount: {
+                        $sum: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: "$transactions",
+                                        as: "transaction",
+                                        cond: {
+                                            $gte: ["$$transaction.createdAt", lastMonth],
+                                        },
+                                    },
+                                },
+                                as: "lastMonthTransaction",
+                                in: "$$lastMonthTransaction.amount",
+                            },
+                        },
+                    },
+                    lastYearAmount: {
+                        $sum: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: "$transactions",
+                                        as: "transaction",
+                                        cond: {
+                                            $gte: ["$$transaction.createdAt", lastYear],
+                                        },
+                                    },
+                                },
+                                as: "lastYearTransaction",
+                                in: "$$lastYearTransaction.amount",
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    totalAmount: 1,
+                    user: {
+                        firstName: "$user.firstName",
+                        lastName: "$user.lastName",
+                        profileImage: "$user.profileImage",
+                    },
+                    todayAmount: 1,
+                    yesterdayAmount: 1,
+                    lastWeekAmount: 1,
+                    lastMonthAmount: 1,
+                    lastYearAmount: 1,
+                },
+            },
+            {
+                $sort: { totalAmount: -1 },
+            },
+        ]);
+
+        const todayUsers = response
+            .filter(user => user.todayAmount > 0)
+            .sort((a, b) => b.todayAmount - a.todayAmount)
+            .map(user => ({
+                _id: user._id,
+                firstName: user.user.firstName,
+                lastName: user.user.lastName,
+                profileImage: user.user.profileImage,
+                totalAmount: user.todayAmount,
+            }));
+
+        const yesterdayUsers = response
+            .filter(user => user.yesterdayAmount > 0)
+            .sort((a, b) => b.yesterdayAmount - a.yesterdayAmount)
+            .map(user => ({
+                _id: user._id,
+                firstName: user.user.firstName,
+                lastName: user.user.lastName,
+                profileImage: user.user.profileImage,
+                totalAmount: user.yesterdayAmount,
+            }));
+
+        const lastWeekUsers = response
+            .filter(user => user.lastWeekAmount > 0)
+            .sort((a, b) => b.lastWeekAmount - a.lastWeekAmount)
+            .map(user => ({
+                _id: user._id,
+                firstName: user.user.firstName,
+                lastName: user.user.lastName,
+                profileImage: user.user.profileImage,
+                totalAmount: user.lastWeekAmount,
+            }));
+
+        const lastMonthUsers = response
+            .filter(user => user.lastMonthAmount > 0)
+            .sort((a, b) => b.lastMonthAmount - a.lastMonthAmount)
+            .map(user => ({
+                _id: user._id,
+                firstName: user.user.firstName,
+                lastName: user.user.lastName,
+                profileImage: user.user.profileImage,
+                totalAmount: user.lastMonthAmount,
+            }));
+
+        const lastYearUsers = response
+            .filter(user => user.lastYearAmount > 0)
+            .sort((a, b) => b.lastYearAmount - a.lastYearAmount)
+            .map(user => ({
+                _id: user._id,
+                firstName: user.user.firstName,
+                lastName: user.user.lastName,
+                profileImage: user.user.profileImage,
+                totalAmount: user.lastYearAmount,
+            }));
+
+
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("user"), {
+            todayUsers,
+            yesterdayUsers,
+            lastWeekUsers,
+            lastMonthUsers,
+            lastYearUsers
+        }, {}))
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error));
+    }
+};
