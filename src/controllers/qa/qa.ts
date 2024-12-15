@@ -601,12 +601,17 @@ export const mistake_map_report = async (req, res) => {
         // Add subtopic information with type safety
         subtopicResponse.forEach((item: any) => {
             const category = item.answers.whyFalse;
-            const subtopicName = item.question.subtopics.name;
+            const subtopicName = item.question?.subtopics?.name;
 
             if (category && subtopicName) {
+                if (!mistakeMap.categories[category]) {
+                    mistakeMap.categories[category] = { total: 0, subtopics: {} };
+                }
+
                 if (!mistakeMap.categories[category].subtopics[subtopicName]) {
                     mistakeMap.categories[category].subtopics[subtopicName] = 0;
                 }
+
                 mistakeMap.categories[category].subtopics[subtopicName]++;
             }
         });
