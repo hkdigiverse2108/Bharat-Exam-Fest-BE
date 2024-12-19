@@ -35,10 +35,12 @@ export const add_user = async (req, res) => {
         value.userType = ROLE_TYPES.USER
         value.otp = otp
         value.isMobileVerified = false
-
-        let referralCodeExist = await userModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
-        if(!referralCodeExist) referralCodeExist = await classesModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
-        if(!referralCodeExist) return res.status(404).json(new apiResponse(404, "Invalid Referral Code", {}, {}))
+        
+        if(value?.referralCode){
+            let referralCodeExist = await userModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
+            if(!referralCodeExist) referralCodeExist = await classesModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
+            if(!referralCodeExist) return res.status(404).json(new apiResponse(404, "Invalid Referral Code", {}, {}))
+        }
         
         while (!userId) {
             let temp = generateUserId(prefix);
