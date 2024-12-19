@@ -3257,10 +3257,14 @@
                     "type": "number"
                   },
                   "contestStartDate": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date",
+                    "example": "2024-12-18T06:51:49.444+00:00"
                   },
                   "contestEndDate": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date",
+                    "example": "2024-12-18T06:51:49.444+00:00"
                   }
                 }
               }
