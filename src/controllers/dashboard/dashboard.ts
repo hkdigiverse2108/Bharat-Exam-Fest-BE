@@ -1,10 +1,11 @@
-import { contestModel, qaModel, questionModel, userModel } from "../../database";
-import { responseMessage } from "../../helper";
+import { balanceModel, contestModel, qaModel, questionModel, transactionModel, userModel } from "../../database";
+import { reqInfo, responseMessage } from "../../helper";
 import { apiResponse, ROLE_TYPES } from "../../utils";
 
 let ObjectId = require('mongoose').Types.ObjectId;
 
 export const dashboard = async (req, res) => {
+    reqInfo(req)
     let { user } = req.headers, { dateFilter } = req.query;
     try {
         if(user.userType == ROLE_TYPES.CLASSES){
@@ -15,6 +16,14 @@ export const dashboard = async (req, res) => {
                 })(),
                 (async () => {
                     let data = await get_all_contests_user_count_and_fees(user, dateFilter)
+                    return data
+                })()
+            ])
+            return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("dashboard"), { sec1, sec2, sec3 }, {}));
+        } else if(user?.userType === ROLE_TYPES.ADMIN){
+            let [sec1, sec2, sec3]: any = await Promise.all([
+                (async () => {
+                    let data = await get_wallet_data(user, dateFilter)
                     return data
                 })()
             ])
@@ -64,5 +73,32 @@ export const get_all_contests_user_count_and_fees = async (user, dateFilter) => 
         return { contests: result, overallTotalFees };
     } catch (error) {
         console.log("error => ", error)
+    }
+}
+
+export const get_wallet_data = async(user, dateFilter) => {
+    let match: any = {}
+    try {
+
+        if(dateFilter){
+            match.createdAt = { $gte: new Date(dateFilter.startDate), $lte: new Date(dateFilter.endDate) }
+        }
+        const result = await balanceModel.aggregate([
+            { $match: { isDeleted: false, ...match } }, // Filter out deleted wallets
+            { $group: { _id: null, totalAmount: { $sum: "$amount" } } } // Sum the amounts
+        ]);
+
+        let transactions = await transactionModel.aggregate([
+            { $match: { isDeleted: false, ...match, description: { $ne : "Referral bonus"} } },
+            { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
+        ])
+
+        let balanceTotalAmount = result.length > 0 ? result[0].totalAmount : 0;
+        let transactionTotalAmount = transactions.length > 0 ? transactions[0].totalAmount : 0;
+
+        let totalAmount = balanceTotalAmount - transactionTotalAmount;
+        return { balanceTotalAmount, transactionTotalAmount, totalAmount }
+    } catch (error) {
+        console.log("get wallet data error => ",error);
     }
 }
