@@ -38,7 +38,7 @@ export const add_user = async (req, res) => {
 
         let referralCodeExist = await userModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
         if(!referralCodeExist) referralCodeExist = await classesModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
-        if(referralCodeExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("referralCode"), {}, {}))
+        if(!referralCodeExist) return res.status(404).json(new apiResponse(404, "Invalid Referral Code", {}, {}))
         
         while (!userId) {
             let temp = generateUserId(prefix);
