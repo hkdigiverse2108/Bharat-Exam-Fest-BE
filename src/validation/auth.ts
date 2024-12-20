@@ -13,6 +13,7 @@ export const signUpSchema = Joi.object().keys({
 
 export const loginSchema = Joi.object().keys({
     uniqueId: Joi.string().required(),
+    countryCode: Joi.string().optional(),
     password: Joi.string().required(),
     userType: Joi.string().required(),
 });

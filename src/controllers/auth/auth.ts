@@ -123,7 +123,7 @@ export const login = async (req, res) => {
         }
 
         if(value?.userType == ROLE_TYPES.USER) {
-            response = await userModel.findOne({ "contact.mobile": value?.uniqueId, userType: ROLE_TYPES.USER, isDeleted: false }).lean()
+            response = await userModel.findOne({ "contact.mobile": value?.uniqueId, "contact.countryCode": value?.countryCode, userType: ROLE_TYPES.USER, isDeleted: false }).lean()
         } else if (value?.userType == ROLE_TYPES.ADMIN) {
             response = await userModel.findOne({ email: value?.uniqueId, userType: ROLE_TYPES.ADMIN, isDeleted: false }).lean()
         } else if (value?.userType == ROLE_TYPES.CLASSES) {
