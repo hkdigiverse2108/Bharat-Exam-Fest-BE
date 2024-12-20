@@ -26,11 +26,11 @@ export const add_classes = async (req, res) => {
         if(value?.password) delete value.password
 
         
-        if(value?.referralCode) {
+        // if(value?.referralCode) {
             let referralCodeExist = await userModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
             if(!referralCodeExist) referralCodeExist = await classesModel.findOne({ referralCode: value?.referralCode, isDeleted: false })
-            if(!referralCodeExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("referralCode"), {}, {}))
-        }
+            if(referralCodeExist) return res.status(404).json(new apiResponse(404, responseMessage?.dataAlreadyExist("referralCode"), {}, {}))
+        // }
     
         value.password = await generateHash(value.password)
         value.userType = ROLE_TYPES.CLASSES
