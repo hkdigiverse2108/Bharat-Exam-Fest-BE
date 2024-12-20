@@ -221,7 +221,7 @@ export const get_user_wise_referral_code = async(req, res) => {
     reqInfo(req)
     let { user } = req.headers
     try {
-        let users = await userModel.find({ referralCode: user?.referralCode, isDeleted: false })
+        let users = await userModel.find({ friendReferralCode: user?.referralCode, isDeleted: false })
         let responses:any = []
         for(let user of users){
             if(user?.userType === ROLE_TYPES.USER){
